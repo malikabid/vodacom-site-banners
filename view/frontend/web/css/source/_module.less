@@ -1,0 +1,253 @@
+//
+// Vodacom SiteBanners - LESS Styles
+// Version 1.0.3
+//
+// This stylesheet demonstrates LESS preprocessor features:
+// - Variables for maintainability
+// - Nesting for better organization
+// - Mixins for reusable patterns
+// - Functions for color manipulation
+//
+
+// ==========================================================================
+// Variables
+// ==========================================================================
+
+// Colors
+@banner-primary-color: #1979c3;
+@banner-bg-white: #ffffff;
+@banner-bg-gray-light: #f5f5f5;
+@banner-bg-gray-lighter: #f9f9f9;
+@banner-border-color: #e3e3e3;
+@banner-text-dark: #333333;
+@banner-text-medium: #666666;
+@banner-text-light: #999999;
+
+// Spacing
+@banner-spacing-xs: 10px;
+@banner-spacing-sm: 15px;
+@banner-spacing-md: 20px;
+@banner-spacing-lg: 30px;
+
+// Typography
+@banner-title-size: 28px;
+@banner-subtitle-size: 14px;
+@banner-demo-title-size: 20px;
+@banner-text-size: 14px;
+@banner-info-size: 12px;
+@banner-font-weight-normal: 400;
+@banner-font-weight-semibold: 600;
+
+// Border & Radius
+@banner-border-width: 1px;
+@banner-border-accent-width: 2px;
+@banner-border-highlight-width: 4px;
+@banner-radius-sm: 4px;
+
+// Container
+@banner-max-width: 1200px;
+
+// ==========================================================================
+// Mixins
+// ==========================================================================
+
+// Box shadow mixin
+.box-shadow(@shadow: 0 2px 4px rgba(0, 0, 0, 0.1)) {
+    -webkit-box-shadow: @shadow;
+    box-shadow: @shadow;
+}
+
+// Border radius mixin
+.border-radius(@radius: @banner-radius-sm) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    border-radius: @radius;
+}
+
+// Reset margins mixin
+.reset-margin() {
+    margin: 0;
+}
+
+// Centered text mixin
+.text-center() {
+    text-align: center;
+}
+
+// ==========================================================================
+// Banner Page Container
+// ==========================================================================
+
+.banner-page {
+    padding: @banner-spacing-md 0;
+}
+
+.banner-container {
+    max-width: @banner-max-width;
+    margin: 0 auto;
+    padding: 0 @banner-spacing-sm;
+    background-color: @banner-bg-white;
+    border: @banner-border-width solid @banner-border-color;
+    .border-radius(@banner-radius-sm);
+    .box-shadow();
+}
+
+// ==========================================================================
+// Banner Header
+// ==========================================================================
+
+.banner-header {
+    padding: @banner-spacing-md;
+    border-bottom: @banner-border-accent-width solid @banner-primary-color;
+    background-color: @banner-bg-gray-light;
+
+    // Nested title styles
+    .banner-title {
+        .reset-margin();
+        margin-bottom: @banner-spacing-xs;
+        font-size: @banner-title-size;
+        font-weight: @banner-font-weight-semibold;
+        color: @banner-text-dark;
+        line-height: 1.2;
+    }
+
+    // Nested subtitle styles
+    .banner-subtitle {
+        .reset-margin();
+        font-size: @banner-subtitle-size;
+        color: @banner-text-medium;
+        line-height: 1.4;
+    }
+}
+
+// ==========================================================================
+// Banner Content
+// ==========================================================================
+
+.banner-content {
+    padding: @banner-spacing-lg @banner-spacing-md;
+
+    // Nested demo section
+    .banner-demo {
+        padding: @banner-spacing-md;
+        background-color: @banner-bg-gray-lighter;
+        border-left: @banner-border-highlight-width solid @banner-primary-color;
+        .border-radius(@banner-radius-sm);
+
+        // Demo title
+        &-title {
+            .reset-margin();
+            margin-bottom: @banner-spacing-sm;
+            font-size: @banner-demo-title-size;
+            font-weight: @banner-font-weight-semibold;
+            color: @banner-primary-color;
+        }
+
+        // Demo text
+        &-text {
+            .reset-margin();
+            margin-bottom: @banner-spacing-xs;
+            font-size: @banner-text-size;
+            color: @banner-text-dark;
+            line-height: 1.6;
+
+            // Last child has no bottom margin
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+// ==========================================================================
+// Banner Footer
+// ==========================================================================
+
+.banner-footer {
+    padding: @banner-spacing-sm @banner-spacing-md;
+    border-top: @banner-border-width solid @banner-border-color;
+    background-color: @banner-bg-gray-light;
+
+    // Footer info text
+    .banner-info {
+        .reset-margin();
+        .text-center();
+        font-size: @banner-info-size;
+        color: @banner-text-light;
+    }
+}
+
+// ==========================================================================
+// Responsive Design (Mobile-first approach)
+// ==========================================================================
+
+// Tablets and up
+@media (min-width: 768px) {
+    .banner-container {
+        padding: 0 @banner-spacing-md;
+    }
+
+    .banner-header {
+        padding: @banner-spacing-lg;
+
+        .banner-title {
+            font-size: @banner-title-size + 4px; // 32px
+        }
+    }
+
+    .banner-content {
+        padding: @banner-spacing-lg * 1.5 @banner-spacing-lg; // 45px 30px
+
+        .banner-demo {
+            padding: @banner-spacing-lg;
+        }
+    }
+
+    .banner-footer {
+        padding: @banner-spacing-md @banner-spacing-lg;
+    }
+}
+
+// Desktop and up
+@media (min-width: 1024px) {
+    .banner-header {
+        .banner-title {
+            font-size: @banner-title-size + 8px; // 36px
+        }
+
+        .banner-subtitle {
+            font-size: @banner-subtitle-size + 2px; // 16px
+        }
+    }
+
+    .banner-content {
+        .banner-demo {
+            &-title {
+                font-size: @banner-demo-title-size + 2px; // 22px
+            }
+
+            &-text {
+                font-size: @banner-text-size + 1px; // 15px
+            }
+        }
+    }
+}
+
+// ==========================================================================
+// LESS Feature Demonstrations
+// ==========================================================================
+
+// Using lighten() and darken() functions for hover states
+.banner-demo:hover {
+    background-color: lighten(@banner-bg-gray-lighter, 2%);
+    border-left-color: darken(@banner-primary-color, 10%);
+}
+
+// Using color manipulation for interactive elements
+.banner-title {
+    transition: color 0.3s ease;
+
+    &:hover {
+        color: @banner-primary-color;
+    }
+}

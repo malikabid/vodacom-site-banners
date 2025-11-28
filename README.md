@@ -47,7 +47,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 2.0.1** (Current Branch: `feature/v2.0.1-schema-patches`)
+**Version 2.0.2** (Current Branch: `feature/v2.0.2-data-patches`)
 
 This version demonstrates:
 - Frontend routing configuration (`routes.xml`)
@@ -57,14 +57,17 @@ This version demonstrates:
 - **LESS preprocessor** (`view/frontend/web/css/source/_module.less`)
 - **Declarative Schema** (`etc/db_schema.xml`) for database table definition
 - **Schema Patches** (`Setup/Patch/Schema/AddActiveDatesToBannerTable.php`) for database alterations
+- **Data Patches** (`Setup/Patch/Data/AddSampleBanners.php`) for database seeding
 - **Model Class** (`Model/Banner.php`) with getter/setter methods including date scheduling
 - **Resource Model** (`Model/ResourceModel/Banner.php`) for database operations
 - **Collection Class** with date-based filtering (`addActiveDateFilter()`)
 - **ORM Pattern** implementation following Magento 2 best practices
 - **Banner Scheduling** with `active_from` and `active_to` datetime columns
 - Date-based activation logic with NULL value handling
+- **Factory + Resource Model pattern** for data insertion
 - Reversible schema changes via `revert()` method
 - Patch tracking in `patch_list` database table
+- **Sample data installation** with 5 diverse banner configurations
 
 ### Accessing the Module
 
@@ -98,7 +101,7 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V2.0.1)
+## Module Structure (V2.0.2)
 
 ```
 Vodacom/SiteBanners/
@@ -106,7 +109,7 @@ Vodacom/SiteBanners/
 │   └── Index/
 │       └── View.php                          # Frontend controller action
 ├── etc/
-│   ├── module.xml                            # Module declaration (v2.0.1)
+│   ├── module.xml                            # Module declaration (v2.0.2)
 │   ├── db_schema.xml                         # Database schema
 │   └── frontend/
 │       └── routes.xml                        # Frontend routing configuration
@@ -118,8 +121,10 @@ Vodacom/SiteBanners/
 │           └── Collection.php                # Banner Collection with date filtering
 ├── Setup/
 │   └── Patch/
-│       └── Schema/
-│           └── AddActiveDatesToBannerTable.php  # Schema Patch (NEW in V2.0.1)
+│       ├── Schema/
+│       │   └── AddActiveDatesToBannerTable.php  # Schema Patch (V2.0.1)
+│       └── Data/
+│           └── AddSampleBanners.php          # Data Patch (NEW in V2.0.2)
 ├── view/
 │   └── frontend/
 │       ├── layout/
@@ -138,16 +143,18 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V2.0.1)
+## Learning Objectives (V2.0.2)
 
 By exploring this version, you will understand:
 
-1. **Schema Patches**: How to alter existing database tables using patch classes
-2. **SchemaPatchInterface**: Implementing the schema patch contract properly
-3. **Patch Lifecycle**: How patches are tracked in `patch_list` table and run once
-4. **Reversible Changes**: Implementing `revert()` method for rollback capability
-5. **Dependencies**: Managing patch execution order with `getDependencies()`
-6. **Database Alterations**: Adding columns to existing tables safely
+1. **Data Patches**: How to insert/seed data into database using patch classes
+2. **DataPatchInterface**: Implementing the data patch contract properly
+3. **Factory Pattern**: Using Factory classes to create model instances
+4. **Resource Model Pattern**: Using Resource Models to save entities (not `$model->save()`)
+5. **Patch Dependencies**: Data patches depending on schema patches
+6. **Error Handling**: Try-catch blocks with logging for production safety
+7. **Sample Data Strategy**: Creating diverse test data for various use cases
+8. **Patch Lifecycle**: How patches are tracked in `patch_list` table and run once
 7. **DateTime Columns**: Working with NULLABLE datetime fields
 8. **NULL Handling**: Treating NULL values as "no restriction" in business logic
 9. **Date-Based Filtering**: Implementing collection filters with datetime logic
@@ -160,7 +167,79 @@ By exploring this version, you will understand:
 
 ## Version History
 
-### Version 2.0.1 (Current)
+### Version 2.0.2 (Current)
+**Branch:** `feature/v2.0.2-data-patches`  
+**Focus:** Data Patches for database seeding  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Data Patch: `Setup/Patch/Data/AddSampleBanners.php`
+- Implemented DataPatchInterface with proper structure
+- Added dependency on AddActiveDatesToBannerTable schema patch
+- Installed 5 diverse sample banners demonstrating:
+  - Always-active banner (no date restrictions)
+  - Past date range (expired holiday sale)
+  - Future date range (upcoming spring promotion)
+  - Inactive banner (manual control)
+  - Expired banner (past dates)
+- Used Factory + Resource Model pattern for data insertion
+- Implemented comprehensive error handling with logging
+- Updated module version to 2.0.2
+
+**Files Changed:**
+- `Setup/Patch/Data/AddSampleBanners.php` - NEW: Data patch for sample banners
+- `etc/module.xml` - Updated version to 2.0.2
+- `README.md` - Updated documentation with V2.0.2 details
+
+**Key Concepts Demonstrated:**
+- **DataPatchInterface Implementation**: Proper structure for data patches
+- **Patch Dependencies**: Data patches depending on schema patches via `getDependencies()`
+- **Factory Pattern**: Creating model instances using `BannerFactory`
+- **Resource Model Pattern**: Saving entities via `BannerResource->save()` (not `$model->save()`)
+- **Error Handling**: Try-catch blocks with logging for production safety
+- **Sample Data Strategy**: Diverse use cases in a single patch
+- **NULL Handling**: Optional datetime fields for flexible scheduling
+- **Patch Tracking**: Automatic tracking in `patch_list` table
+
+**Sample Banner Details:**
+1. **Welcome Banner** (sort_order: 10)
+   - Always active, no date restrictions
+   - Demonstrates basic active banner
+
+2. **Holiday Sale 2024** (sort_order: 20)
+   - Active with past date range (Dec 2024)
+   - Demonstrates expired scheduled content
+
+3. **Spring Promotion 2026** (sort_order: 30)
+   - Active with future date range (March 2026)
+   - Demonstrates upcoming scheduled content
+
+4. **Flash Sale - Inactive** (sort_order: 40)
+   - Manually deactivated (is_active = 0)
+   - Demonstrates manual control override
+
+5. **Expired Limited Time Offer** (sort_order: 50)
+   - Active but with expired dates (Jan 2024)
+   - Demonstrates active flag vs date scheduling
+
+**Usage:**
+Sample banners are automatically installed during `setup:upgrade`. 
+No manual data entry needed for testing or demonstration.
+
+**Database Verification:**
+```bash
+# Access database
+docker exec -it hyva-tutorials-db-1 mariadb -u magento -pmagento magento
+
+# Check sample banners
+SELECT banner_id, title, is_active, active_from, active_to, sort_order 
+FROM vodacom_sitebanners_banner ORDER BY sort_order;
+
+# Verify patch tracking
+SELECT * FROM patch_list WHERE patch_name LIKE '%AddSampleBanners%';
+```
+
+### Version 2.0.1
 **Branch:** `feature/v2.0.1-schema-patches`  
 **Focus:** Schema Patches for database alterations  
 **Status:** ✅ Completed

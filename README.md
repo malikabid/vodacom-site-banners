@@ -19,6 +19,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/view-with-css-style`             |
 | V1.0.3   | LESS Styling               | LESS Preprocessor, Variables, Mixins, Nesting, Luma Integration           | `feature/v1.0.3-less-styling`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
+| V2.0.1   | Schema Patches             | Schema Patches, Database Alterations, Migration Strategy                  | `feature/v2.0.1-schema-patches`           |
 | V3.0.0   | Admin UI                   | Admin Menu, ACL, UI Components (Grid & Form)                              | `feature/v3.0.0-admin-uicomponents`       |
 | V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
 | V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
@@ -46,7 +47,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 2.0.0** (Current Branch: `feature/v2.0.0-db-models-schema`)
+**Version 2.0.1** (Current Branch: `feature/v2.0.1-schema-patches`)
 
 This version demonstrates:
 - Frontend routing configuration (`routes.xml`)
@@ -55,13 +56,15 @@ This version demonstrates:
 - Template file organization with semantic HTML
 - **LESS preprocessor** (`view/frontend/web/css/source/_module.less`)
 - **Declarative Schema** (`etc/db_schema.xml`) for database table definition
-- **Model Class** (`Model/Banner.php`) extending AbstractModel with getter/setter methods
+- **Schema Patches** (`Setup/Patch/Schema/AddActiveDatesToBannerTable.php`) for database alterations
+- **Model Class** (`Model/Banner.php`) with getter/setter methods including date scheduling
 - **Resource Model** (`Model/ResourceModel/Banner.php`) for database operations
-- **Collection Class** (`Model/ResourceModel/Banner/Collection.php`) with filtering methods
+- **Collection Class** with date-based filtering (`addActiveDateFilter()`)
 - **ORM Pattern** implementation following Magento 2 best practices
-- Database indexing on `is_active` and `sort_order` columns
-- Timestamps (`created_at`, `updated_at`) with automatic updates
-- Custom collection methods for filtering active banners
+- **Banner Scheduling** with `active_from` and `active_to` datetime columns
+- Date-based activation logic with NULL value handling
+- Reversible schema changes via `revert()` method
+- Patch tracking in `patch_list` database table
 
 ### Accessing the Module
 
@@ -70,7 +73,7 @@ Once installed, visit the banner display page at:
 http://your-magento-site.local/banners/index/view
 ```
 
-The page displays banners with LESS styling. Database table is ready for CRUD operations.
+The page displays banners with LESS styling. Banners can now be scheduled with activation dates.
 
 ---
 
@@ -78,7 +81,7 @@ The page displays banners with LESS styling. Database table is ready for CRUD op
 
 To view a specific concept, switch to the corresponding branch:
 ```bash
-git checkout feature/v2.0.0-db-models-schema
+git checkout feature/v2.0.1-schema-patches
 ```
 
 **Important**: This project uses Mark Shust's Docker setup. Run all commands from the workspace root:
@@ -95,7 +98,7 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V2.0.0)
+## Module Structure (V2.0.1)
 
 ```
 Vodacom/SiteBanners/
@@ -103,16 +106,20 @@ Vodacom/SiteBanners/
 │   └── Index/
 │       └── View.php                          # Frontend controller action
 ├── etc/
-│   ├── module.xml                            # Module declaration (v2.0.0)
-│   ├── db_schema.xml                         # Database schema (NEW in V2.0.0)
+│   ├── module.xml                            # Module declaration (v2.0.1)
+│   ├── db_schema.xml                         # Database schema
 │   └── frontend/
 │       └── routes.xml                        # Frontend routing configuration
 ├── Model/
-│   ├── Banner.php                            # Banner Model (NEW in V2.0.0)
+│   ├── Banner.php                            # Banner Model with date scheduling
 │   └── ResourceModel/
-│       ├── Banner.php                        # Banner Resource Model (NEW in V2.0.0)
+│       ├── Banner.php                        # Banner Resource Model
 │       └── Banner/
-│           └── Collection.php                # Banner Collection (NEW in V2.0.0)
+│           └── Collection.php                # Banner Collection with date filtering
+├── Setup/
+│   └── Patch/
+│       └── Schema/
+│           └── AddActiveDatesToBannerTable.php  # Schema Patch (NEW in V2.0.1)
 ├── view/
 │   └── frontend/
 │       ├── layout/
@@ -131,29 +138,99 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V2.0.0)
+## Learning Objectives (V2.0.1)
 
 By exploring this version, you will understand:
 
-1. **Declarative Schema**: How to define database tables using `db_schema.xml`
-2. **Database Table Structure**: Column types, constraints, indexes, and primary keys
-3. **Model Layer**: Creating Model classes extending `AbstractModel`
-4. **Resource Model**: Implementing Resource Models for database operations
-5. **Collections**: Building Collection classes for fetching multiple records
-6. **ORM Pattern**: Using Magento's ORM instead of raw SQL queries
-7. **Getter/Setter Methods**: Type-safe data access methods with proper type hints
-8. **Cache Tags**: Implementing cache tags for efficient cache invalidation
-9. **Event Prefixes**: Setting up event prefixes for observers
-10. **Collection Filtering**: Custom methods for filtering data (e.g., active banners)
-11. **Database Indexes**: Optimizing queries with proper indexing strategy
-12. **Timestamps**: Automatic `created_at` and `updated_at` timestamp management
-13. **Setup:Upgrade**: How `setup:upgrade` creates tables from declarative schema
+1. **Schema Patches**: How to alter existing database tables using patch classes
+2. **SchemaPatchInterface**: Implementing the schema patch contract properly
+3. **Patch Lifecycle**: How patches are tracked in `patch_list` table and run once
+4. **Reversible Changes**: Implementing `revert()` method for rollback capability
+5. **Dependencies**: Managing patch execution order with `getDependencies()`
+6. **Database Alterations**: Adding columns to existing tables safely
+7. **DateTime Columns**: Working with NULLABLE datetime fields
+8. **NULL Handling**: Treating NULL values as "no restriction" in business logic
+9. **Date-Based Filtering**: Implementing collection filters with datetime logic
+10. **Model Extensions**: Adding new getter/setter methods to existing models
+11. **Helper Methods**: Creating convenience methods like `isActiveByDate()`
+12. **Migration Strategy**: When to use patches vs declarative schema
+13. **Production Safety**: Safe database modifications for live systems
 
 ---
 
 ## Version History
 
-### Version 2.0.0 (Current)
+### Version 2.0.1 (Current)
+**Branch:** `feature/v2.0.1-schema-patches`  
+**Focus:** Schema Patches for database alterations  
+**Status:** ✅ Completed
+
+**What's New:**
+- Implemented Schema Patch to add `active_from` and `active_to` columns to existing banner table
+- Added date-based banner scheduling functionality
+- Extended Banner Model with date getter/setter methods (`getActiveFrom`, `setActiveFrom`, `getActiveTo`, `setActiveTo`)
+- Added `isActiveByDate()` helper method for date range validation
+- Enhanced Collection with `addActiveDateFilter()` for date-based filtering
+- Implemented reversible schema changes via `revert()` method
+- Added NULL handling for flexible scheduling (NULL = no date restriction)
+- Updated module version to 2.0.1
+
+**Files Changed:**
+- `Setup/Patch/Schema/AddActiveDatesToBannerTable.php` - NEW: Schema patch adding active_from/active_to columns
+- `Model/Banner.php` - Updated: Added date-related getter/setter methods and isActiveByDate() helper
+- `Model/ResourceModel/Banner/Collection.php` - Updated: Added addActiveDateFilter() method
+- `etc/module.xml` - Updated version to 2.0.1
+- `.github/copilot-instructions.md` - Added comprehensive V2.0.1 implementation guide
+- `.github/project_context.md` - Added schema patches best practices and V2.0.1 checklist
+- `README.md` - Updated documentation with V2.0.1 details
+
+**Key Concepts Demonstrated:**
+- **Schema Patches**: Using SchemaPatchInterface for database alterations
+- **Patch Lifecycle**: apply(), revert(), getDependencies(), getAliases() methods
+- **Reversible Changes**: Implementing proper rollback via revert() method
+- **Patch Tracking**: Automatic tracking in patch_list table
+- **DateTime Columns**: Adding DATETIME NULLABLE columns for scheduling
+- **NULL Handling**: Treating NULL as "no restriction" for flexible scheduling
+- **Date-Based Filtering**: Collection methods for time-based queries
+- **Model Extensions**: Adding methods to existing models
+- **Migration Strategy**: Patches vs declarative schema modifications
+- **Production Safety**: Non-destructive schema alterations
+
+**Database Schema Changes:**
+```sql
+-- Columns added by AddActiveDatesToBannerTable patch
+ALTER TABLE vodacom_sitebanners_banner 
+  ADD COLUMN active_from DATETIME NULL COMMENT 'Active From Date/Time',
+  ADD COLUMN active_to DATETIME NULL COMMENT 'Active To Date/Time';
+```
+
+**Usage Example:**
+```php
+// Create scheduled banner
+$banner = $bannerFactory->create();
+$banner->setTitle('Holiday Banner')
+    ->setContent('Special holiday promotion!')
+    ->setIsActive(1)
+    ->setActiveFrom('2024-12-01 00:00:00')  // Start Dec 1st
+    ->setActiveTo('2024-12-31 23:59:59')    // End Dec 31st
+    ->save();
+
+// Get currently active banners (respects date range)
+$collection = $bannerCollectionFactory->create()
+    ->addActiveFilter(true)
+    ->addActiveDateFilter();  // Filters by current date/time
+
+// Check if banner is active by date
+if ($banner->isActiveByDate()) {
+    echo "Banner is currently active";
+}
+
+// Get banners active on specific date
+$collection = $bannerCollectionFactory->create()
+    ->addActiveDateFilter('2024-12-15 12:00:00');
+```
+
+### Version 2.0.0
 **Branch:** `feature/v2.0.0-db-models-schema`  
 **Focus:** Database schema, Models, Resource Models, Collections  
 **Status:** ✅ Completed

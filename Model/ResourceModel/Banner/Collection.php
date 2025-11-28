@@ -69,13 +69,53 @@ class Collection extends AbstractCollection
     }
 
     /**
+     * Add active date filter to collection
+     *
+     * Filters banners based on active_from and active_to dates.
+     * NULL values are treated as no restriction.
+     *
+     * @param string|null $date Date to check (defaults to current date/time)
+     * @return $this
+     */
+    public function addActiveDateFilter(?string $date = null): self
+    {
+        if ($date === null) {
+            $date = date('Y-m-d H:i:s');
+        }
+
+        // Banner is active if:
+        // 1. active_from is NULL OR active_from <= current date
+        // 2. active_to is NULL OR active_to >= current date
+        $this->addFieldToFilter(
+            ['active_from', 'active_from'],
+            [
+                ['null' => true],
+                ['lteq' => $date]
+            ]
+        );
+
+        $this->addFieldToFilter(
+            ['active_to', 'active_to'],
+            [
+                ['null' => true],
+                ['gteq' => $date]
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
      * Get active banners ordered by sort order
+     *
+     * This method now includes date-based filtering
      *
      * @return $this
      */
     public function getActiveBanners(): self
     {
         return $this->addActiveFilter(true)
+            ->addActiveDateFilter()
             ->addSortOrderFilter('ASC');
     }
 }

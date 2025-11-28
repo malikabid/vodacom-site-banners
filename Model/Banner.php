@@ -191,6 +191,76 @@ class Banner extends AbstractModel
     }
 
     /**
+     * Get Active From
+     *
+     * @return string|null
+     */
+    public function getActiveFrom(): ?string
+    {
+        return $this->getData('active_from');
+    }
+
+    /**
+     * Set Active From
+     *
+     * @param string|null $activeFrom
+     * @return $this
+     */
+    public function setActiveFrom(?string $activeFrom): self
+    {
+        return $this->setData('active_from', $activeFrom);
+    }
+
+    /**
+     * Get Active To
+     *
+     * @return string|null
+     */
+    public function getActiveTo(): ?string
+    {
+        return $this->getData('active_to');
+    }
+
+    /**
+     * Set Active To
+     *
+     * @param string|null $activeTo
+     * @return $this
+     */
+    public function setActiveTo(?string $activeTo): self
+    {
+        return $this->setData('active_to', $activeTo);
+    }
+
+    /**
+     * Check if banner is active based on date range
+     *
+     * @return bool
+     */
+    public function isActiveByDate(): bool
+    {
+        $now = new \DateTime();
+        
+        $activeFrom = $this->getActiveFrom();
+        if ($activeFrom !== null) {
+            $fromDate = new \DateTime($activeFrom);
+            if ($now < $fromDate) {
+                return false;
+            }
+        }
+        
+        $activeTo = $this->getActiveTo();
+        if ($activeTo !== null) {
+            $toDate = new \DateTime($activeTo);
+            if ($now > $toDate) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
      * Get identities
      *
      * @return array<string>

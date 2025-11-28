@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Vendor\SiteBanners\Controller\Index;
+namespace Vodacom\SiteBanners\Controller\Index;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultFactory;

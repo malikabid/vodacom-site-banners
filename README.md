@@ -19,6 +19,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/view-with-css-style`             |
 | V1.0.3   | LESS Styling               | LESS Preprocessor, Variables, Mixins, Nesting, Luma Integration           | `feature/v1.0.3-less-styling`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
+| V2.0.1   | Schema Patches             | Schema Patches, Database Alterations, Migration Strategy                  | `feature/v2.0.1-schema-patches`           |
 | V3.0.0   | Admin UI                   | Admin Menu, ACL, UI Components (Grid & Form)                              | `feature/v3.0.0-admin-uicomponents`       |
 | V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
 | V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
@@ -46,7 +47,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 1.0.3** (Current Branch: `feature/v1.0.3-less-styling`)
+**Version 2.0.2** (Current Branch: `feature/v2.0.2-data-patches`)
 
 This version demonstrates:
 - Frontend routing configuration (`routes.xml`)
@@ -54,13 +55,19 @@ This version demonstrates:
 - Layout XML file structure (`banners_index_view.xml`)
 - Template file organization with semantic HTML
 - **LESS preprocessor** (`view/frontend/web/css/source/_module.less`)
-- **LESS Variables** for colors, spacing, typography, and dimensions
-- **LESS Mixins** for reusable style patterns (box-shadow, border-radius)
-- **LESS Nesting** for better code organization and hierarchy
-- **LESS Functions** (lighten, darken) for color manipulation
-- **Luma theme integration** with proper LESS compilation
-- Responsive design with mobile-first approach
-- Professional component-based styling
+- **Declarative Schema** (`etc/db_schema.xml`) for database table definition
+- **Schema Patches** (`Setup/Patch/Schema/AddActiveDatesToBannerTable.php`) for database alterations
+- **Data Patches** (`Setup/Patch/Data/AddSampleBanners.php`) for database seeding
+- **Model Class** (`Model/Banner.php`) with getter/setter methods including date scheduling
+- **Resource Model** (`Model/ResourceModel/Banner.php`) for database operations
+- **Collection Class** with date-based filtering (`addActiveDateFilter()`)
+- **ORM Pattern** implementation following Magento 2 best practices
+- **Banner Scheduling** with `active_from` and `active_to` datetime columns
+- Date-based activation logic with NULL value handling
+- **Factory + Resource Model pattern** for data insertion
+- Reversible schema changes via `revert()` method
+- Patch tracking in `patch_list` database table
+- **Sample data installation** with 5 diverse banner configurations
 
 ### Accessing the Module
 
@@ -69,7 +76,7 @@ Once installed, visit the banner display page at:
 http://your-magento-site.local/banners/index/view
 ```
 
-The page now features professionally styled banners compiled from LESS sources.
+The page displays banners with LESS styling. Banners can now be scheduled with activation dates.
 
 ---
 
@@ -77,7 +84,7 @@ The page now features professionally styled banners compiled from LESS sources.
 
 To view a specific concept, switch to the corresponding branch:
 ```bash
-git checkout feature/v1.0.3-less-styling
+git checkout feature/v2.0.1-schema-patches
 ```
 
 **Important**: This project uses Mark Shust's Docker setup. Run all commands from the workspace root:
@@ -94,7 +101,7 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V1.0.3)
+## Module Structure (V2.0.2)
 
 ```
 Vodacom/SiteBanners/
@@ -102,9 +109,22 @@ Vodacom/SiteBanners/
 │   └── Index/
 │       └── View.php                          # Frontend controller action
 ├── etc/
-│   ├── module.xml                            # Module declaration (v1.0.3)
+│   ├── module.xml                            # Module declaration (v2.0.2)
+│   ├── db_schema.xml                         # Database schema
 │   └── frontend/
 │       └── routes.xml                        # Frontend routing configuration
+├── Model/
+│   ├── Banner.php                            # Banner Model with date scheduling
+│   └── ResourceModel/
+│       ├── Banner.php                        # Banner Resource Model
+│       └── Banner/
+│           └── Collection.php                # Banner Collection with date filtering
+├── Setup/
+│   └── Patch/
+│       ├── Schema/
+│       │   └── AddActiveDatesToBannerTable.php  # Schema Patch (V2.0.1)
+│       └── Data/
+│           └── AddSampleBanners.php          # Data Patch (NEW in V2.0.2)
 ├── view/
 │   └── frontend/
 │       ├── layout/
@@ -115,7 +135,7 @@ Vodacom/SiteBanners/
 │       └── web/
 │           └── css/
 │               └── source/
-│                   └── _module.less          # LESS stylesheet (NEW in V1.0.3)
+│                   └── _module.less          # LESS stylesheet
 ├── composer.json                              # Composer package definition
 ├── registration.php                           # Module registration
 └── README.md                                  # This file
@@ -123,28 +143,235 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V1.0.3)
+## Learning Objectives (V2.0.2)
 
 By exploring this version, you will understand:
 
-1. **Routing**: How URLs are mapped to controllers via `routes.xml`
-2. **Controllers**: How to create frontend controller actions
-3. **Layout System**: How layout XML files define page structure and load assets
-4. **Templates**: How to create and organize `.phtml` template files with semantic HTML
-5. **LESS Preprocessor**: How to use LESS for advanced CSS development
-6. **LESS Variables**: Declaring and using variables for colors, spacing, typography
-7. **LESS Mixins**: Creating reusable style patterns and functions
-8. **LESS Nesting**: Organizing styles hierarchically for better maintainability
-9. **LESS Functions**: Using built-in functions like `lighten()`, `darken()` for color manipulation
-10. **Luma Integration**: How LESS files integrate with Magento's Luma theme
-11. **Static Content Deployment**: How Magento compiles LESS to CSS during deployment
-12. **Request Flow**: The complete flow from URL to LESS-compiled styled output
+1. **Data Patches**: How to insert/seed data into database using patch classes
+2. **DataPatchInterface**: Implementing the data patch contract properly
+3. **Factory Pattern**: Using Factory classes to create model instances
+4. **Resource Model Pattern**: Using Resource Models to save entities (not `$model->save()`)
+5. **Patch Dependencies**: Data patches depending on schema patches
+6. **Error Handling**: Try-catch blocks with logging for production safety
+7. **Sample Data Strategy**: Creating diverse test data for various use cases
+8. **Patch Lifecycle**: How patches are tracked in `patch_list` table and run once
+7. **DateTime Columns**: Working with NULLABLE datetime fields
+8. **NULL Handling**: Treating NULL values as "no restriction" in business logic
+9. **Date-Based Filtering**: Implementing collection filters with datetime logic
+10. **Model Extensions**: Adding new getter/setter methods to existing models
+11. **Helper Methods**: Creating convenience methods like `isActiveByDate()`
+12. **Migration Strategy**: When to use patches vs declarative schema
+13. **Production Safety**: Safe database modifications for live systems
 
 ---
 
 ## Version History
 
-### Version 1.0.3 (Current)
+### Version 2.0.2 (Current)
+**Branch:** `feature/v2.0.2-data-patches`  
+**Focus:** Data Patches for database seeding  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Data Patch: `Setup/Patch/Data/AddSampleBanners.php`
+- Implemented DataPatchInterface with proper structure
+- Added dependency on AddActiveDatesToBannerTable schema patch
+- Installed 5 diverse sample banners demonstrating:
+  - Always-active banner (no date restrictions)
+  - Past date range (expired holiday sale)
+  - Future date range (upcoming spring promotion)
+  - Inactive banner (manual control)
+  - Expired banner (past dates)
+- Used Factory + Resource Model pattern for data insertion
+- Implemented comprehensive error handling with logging
+- Updated module version to 2.0.2
+
+**Files Changed:**
+- `Setup/Patch/Data/AddSampleBanners.php` - NEW: Data patch for sample banners
+- `etc/module.xml` - Updated version to 2.0.2
+- `README.md` - Updated documentation with V2.0.2 details
+
+**Key Concepts Demonstrated:**
+- **DataPatchInterface Implementation**: Proper structure for data patches
+- **Patch Dependencies**: Data patches depending on schema patches via `getDependencies()`
+- **Factory Pattern**: Creating model instances using `BannerFactory`
+- **Resource Model Pattern**: Saving entities via `BannerResource->save()` (not `$model->save()`)
+- **Error Handling**: Try-catch blocks with logging for production safety
+- **Sample Data Strategy**: Diverse use cases in a single patch
+- **NULL Handling**: Optional datetime fields for flexible scheduling
+- **Patch Tracking**: Automatic tracking in `patch_list` table
+
+**Sample Banner Details:**
+1. **Welcome Banner** (sort_order: 10)
+   - Always active, no date restrictions
+   - Demonstrates basic active banner
+
+2. **Holiday Sale 2024** (sort_order: 20)
+   - Active with past date range (Dec 2024)
+   - Demonstrates expired scheduled content
+
+3. **Spring Promotion 2026** (sort_order: 30)
+   - Active with future date range (March 2026)
+   - Demonstrates upcoming scheduled content
+
+4. **Flash Sale - Inactive** (sort_order: 40)
+   - Manually deactivated (is_active = 0)
+   - Demonstrates manual control override
+
+5. **Expired Limited Time Offer** (sort_order: 50)
+   - Active but with expired dates (Jan 2024)
+   - Demonstrates active flag vs date scheduling
+
+**Usage:**
+Sample banners are automatically installed during `setup:upgrade`. 
+No manual data entry needed for testing or demonstration.
+
+**Database Verification:**
+```bash
+# Access database
+docker exec -it hyva-tutorials-db-1 mariadb -u magento -pmagento magento
+
+# Check sample banners
+SELECT banner_id, title, is_active, active_from, active_to, sort_order 
+FROM vodacom_sitebanners_banner ORDER BY sort_order;
+
+# Verify patch tracking
+SELECT * FROM patch_list WHERE patch_name LIKE '%AddSampleBanners%';
+```
+
+### Version 2.0.1
+**Branch:** `feature/v2.0.1-schema-patches`  
+**Focus:** Schema Patches for database alterations  
+**Status:** ✅ Completed
+
+**What's New:**
+- Implemented Schema Patch to add `active_from` and `active_to` columns to existing banner table
+- Added date-based banner scheduling functionality
+- Extended Banner Model with date getter/setter methods (`getActiveFrom`, `setActiveFrom`, `getActiveTo`, `setActiveTo`)
+- Added `isActiveByDate()` helper method for date range validation
+- Enhanced Collection with `addActiveDateFilter()` for date-based filtering
+- Implemented reversible schema changes via `revert()` method
+- Added NULL handling for flexible scheduling (NULL = no date restriction)
+- Updated module version to 2.0.1
+
+**Files Changed:**
+- `Setup/Patch/Schema/AddActiveDatesToBannerTable.php` - NEW: Schema patch adding active_from/active_to columns
+- `Model/Banner.php` - Updated: Added date-related getter/setter methods and isActiveByDate() helper
+- `Model/ResourceModel/Banner/Collection.php` - Updated: Added addActiveDateFilter() method
+- `etc/module.xml` - Updated version to 2.0.1
+- `.github/copilot-instructions.md` - Added comprehensive V2.0.1 implementation guide
+- `.github/project_context.md` - Added schema patches best practices and V2.0.1 checklist
+- `README.md` - Updated documentation with V2.0.1 details
+
+**Key Concepts Demonstrated:**
+- **Schema Patches**: Using SchemaPatchInterface for database alterations
+- **Patch Lifecycle**: apply(), revert(), getDependencies(), getAliases() methods
+- **Reversible Changes**: Implementing proper rollback via revert() method
+- **Patch Tracking**: Automatic tracking in patch_list table
+- **DateTime Columns**: Adding DATETIME NULLABLE columns for scheduling
+- **NULL Handling**: Treating NULL as "no restriction" for flexible scheduling
+- **Date-Based Filtering**: Collection methods for time-based queries
+- **Model Extensions**: Adding methods to existing models
+- **Migration Strategy**: Patches vs declarative schema modifications
+- **Production Safety**: Non-destructive schema alterations
+
+**Database Schema Changes:**
+```sql
+-- Columns added by AddActiveDatesToBannerTable patch
+ALTER TABLE vodacom_sitebanners_banner 
+  ADD COLUMN active_from DATETIME NULL COMMENT 'Active From Date/Time',
+  ADD COLUMN active_to DATETIME NULL COMMENT 'Active To Date/Time';
+```
+
+**Usage Example:**
+```php
+// Create scheduled banner
+$banner = $bannerFactory->create();
+$banner->setTitle('Holiday Banner')
+    ->setContent('Special holiday promotion!')
+    ->setIsActive(1)
+    ->setActiveFrom('2024-12-01 00:00:00')  // Start Dec 1st
+    ->setActiveTo('2024-12-31 23:59:59')    // End Dec 31st
+    ->save();
+
+// Get currently active banners (respects date range)
+$collection = $bannerCollectionFactory->create()
+    ->addActiveFilter(true)
+    ->addActiveDateFilter();  // Filters by current date/time
+
+// Check if banner is active by date
+if ($banner->isActiveByDate()) {
+    echo "Banner is currently active";
+}
+
+// Get banners active on specific date
+$collection = $bannerCollectionFactory->create()
+    ->addActiveDateFilter('2024-12-15 12:00:00');
+```
+
+### Version 2.0.0
+**Branch:** `feature/v2.0.0-db-models-schema`  
+**Focus:** Database schema, Models, Resource Models, Collections  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created declarative schema `etc/db_schema.xml` with `vodacom_sitebanners_banner` table
+- Implemented Banner Model extending AbstractModel with full getter/setter methods
+- Created Banner Resource Model for database operations
+- Built Banner Collection with custom filtering methods (`addActiveFilter`, `getActiveBanners`)
+- Added database indexes on `is_active` and `sort_order` for query optimization
+- Implemented automatic timestamp management (`created_at`, `updated_at`)
+- Added cache tags and event prefixes for extensibility
+- Updated module version to 2.0.0
+
+**Files Changed:**
+- `etc/db_schema.xml` - NEW: Database schema definition
+- `Model/Banner.php` - NEW: Banner Model with getter/setter methods
+- `Model/ResourceModel/Banner.php` - NEW: Banner Resource Model
+- `Model/ResourceModel/Banner/Collection.php` - NEW: Banner Collection with filtering
+- `etc/module.xml` - Updated version to 2.0.0
+- `README.md` - Updated documentation with V2.0.0 details
+
+**Key Concepts Demonstrated:**
+- Declarative Schema: XML-based database definition
+- Model-Resource-Collection Pattern: Magento's ORM architecture
+- AbstractModel: Base class for entity models
+- AbstractDb: Base class for resource models
+- AbstractCollection: Base class for collections
+- Type Safety: Strict type hints on all methods
+- Database Optimization: Proper indexing strategy
+
+**Database Schema:**
+```sql
+CREATE TABLE vodacom_sitebanners_banner (
+    banner_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    is_active SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX (is_active),
+    INDEX (sort_order)
+);
+```
+
+**Usage Example:**
+```php
+// Load banner by ID
+$banner = $bannerFactory->create()->load($bannerId);
+
+// Get active banners
+$collection = $bannerCollectionFactory->create()
+    ->getActiveBanners();
+
+// Filter collection
+$collection = $bannerCollectionFactory->create()
+    ->addActiveFilter(true)
+    ->addSortOrderFilter('ASC');
+```
+
+### Version 1.0.3
 **Branch:** `feature/v1.0.3-less-styling`  
 **Focus:** LESS preprocessor and Luma theme integration  
 **Status:** ✅ Completed

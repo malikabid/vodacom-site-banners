@@ -16,6 +16,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 |----------|----------------------------|---------------------------------------------------------------------------|-------------------------------------------|
 | V1.0.0   | Routing, Layout, Blocks    | Request Flow (URL → Controller → Block)                                   | `feature/v1.0.0-routing-layout`           |
 | V1.0.1   | Routing Composition        | Controller Composition Layout Handles, Template Organization              | `feature/v1.0.1-routing-composition`      |
+| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/view-with-css-style`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
 | V3.0.0   | Admin UI                   | Admin Menu, ACL, UI Components (Grid & Form)                              | `feature/v3.0.0-admin-uicomponents`       |
 | V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
@@ -44,14 +45,17 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 1.0.1** (Current Branch: `feature/v1.0.1-routing-composition`)
+**Version 1.0.2** (Current Branch: `feature/view-with-css-style`)
 
 This version demonstrates:
 - Frontend routing configuration (`routes.xml`)
 - Controller action implementation (`Controller/Index/View.php`)
 - Layout XML file structure (`banners_index_view.xml`)
-- Template file organization
-- Basic MVC pattern in Magento 2
+- Template file organization with semantic HTML
+- **Static CSS assets** (`view/frontend/web/css/banners.css`)
+- **Asset loading** via layout XML
+- Professional styling with plain CSS
+- Responsive design patterns
 
 ### Accessing the Module
 
@@ -60,24 +64,31 @@ Once installed, visit the banner display page at:
 http://your-magento-site.local/banners/index/view
 ```
 
+The page now features professionally styled banners with CSS styling.
+
 ---
 
 ## Development & Demonstration Notes
 
 To view a specific concept, switch to the corresponding branch:
 ```bash
-git checkout feature/v1.0.1-routing-composition
+git checkout feature/view-with-css-style
 ```
-After switching branches, always run:
+
+**Important**: This project uses Mark Shust's Docker setup. Run all commands from the workspace root:
+
 ```bash
+# From /path/to/hyva-tutorials (workspace root, not src/)
 bin/magento setup:upgrade
 bin/magento cache:clean
+bin/magento cache:flush
 ```
-as configuration files (e.g., `di.xml`, `db_schema.xml`, `routes.xml`) change between versions.
+
+After switching branches, always clear cache and run setup:upgrade as configuration files (e.g., `di.xml`, `db_schema.xml`, `routes.xml`, layout XML) change between versions.
 
 ---
 
-## Module Structure (V1.0.1)
+## Module Structure (V1.0.2)
 
 ```
 Vodacom/SiteBanners/
@@ -91,9 +102,12 @@ Vodacom/SiteBanners/
 ├── view/
 │   └── frontend/
 │       ├── layout/
-│       │   └── banners_index_view.xml        # Layout configuration
-│       └── templates/
-│           └── view.phtml                     # Frontend template
+│       │   └── banners_index_view.xml        # Layout configuration (includes CSS)
+│       ├── templates/
+│       │   └── view.phtml                    # Frontend template
+│       └── web/
+│           └── css/
+│               └── banners.css               # Custom CSS styles
 ├── composer.json                              # Composer package definition
 ├── registration.php                           # Module registration
 └── README.md                                  # This file
@@ -101,15 +115,18 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V1.0.1)
+## Learning Objectives (V1.0.2)
 
 By exploring this version, you will understand:
 
 1. **Routing**: How URLs are mapped to controllers via `routes.xml`
 2. **Controllers**: How to create frontend controller actions
-3. **Layout System**: How layout XML files define page structure
-4. **Templates**: How to create and organize `.phtml` template files
-5. **Request Flow**: The complete flow from URL to rendered output
+3. **Layout System**: How layout XML files define page structure and load assets
+4. **Templates**: How to create and organize `.phtml` template files with semantic HTML
+5. **Static Assets**: How to organize and load CSS files in `view/frontend/web/`
+6. **Asset Management**: How Magento processes and serves static assets
+7. **CSS Styling**: Professional CSS techniques without preprocessors
+8. **Request Flow**: The complete flow from URL to styled rendered output
 
 ---
 

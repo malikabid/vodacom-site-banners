@@ -1,21 +1,29 @@
 <?php
 /**
- * @var \Magento\Framework\View\Element\Template $block
+ * @var $block \Magento\Framework\View\Element\Template
  */
 ?>
-
-<div class="site-banner-container mt-10 p-6 bg-blue-100 border-l-4 border-blue-500 text-blue-800 rounded-lg shadow-md">
-    <h1 class="text-3xl font-bold mb-4">Vodacom Site Banners Demonstration Page (V1.0.0)</h1>
-    <p class="text-lg">
-        This page successfully demonstrates **Routing (FrontName: banners)**, **Controller (Action: view)**, and **Layout/Block** rendering.
-    </p>
-    <div class="mt-4 p-4 border border-blue-500 bg-white rounded">
-        <strong class="font-semibold text-blue-600">Content from Block:</strong>
-        <!-- Retrieves data passed from the layout XML (The "message" argument) -->
-        <p class="mt-1 text-gray-700"><?= $block->getData('message') ?></p>
+<div class="banner-page">
+    <div class="banner-container">
+        <header class="banner-header">
+            <h1 class="banner-title"><?= __('Site Banners') ?></h1>
+            <p class="banner-subtitle"><?= __('Manage your promotional banners') ?></p>
+        </header>
+        
+        <div class="banner-content">
+            <div class="banner-demo">
+                <h2 class="banner-demo-title"><?= __('Demo Banner') ?></h2>
+                <p class="banner-demo-text">
+                    <?= __('This is a demonstration of the Vodacom Site Banners module.') ?>
+                </p>
+                <p class="banner-demo-text">
+                    <?= __('Version 1.0.2 showcases plain CSS styling with semantic class names.') ?>
+                </p>
+            </div>
+        </div>
+        
+        <footer class="banner-footer">
+            <p class="banner-info"><?= __('Vodacom SiteBanners Module - Version 1.0.2') ?></p>
+        </footer>
     </div>
-    <p class="mt-6 text-sm italic text-gray-500">
-        To see this work, run `bin/magento setup:upgrade` and visit: 
-        <a href="/banners/index/view" class="text-blue-600 hover:underline">/banners/index/view</a>
-    </p>
 </div>

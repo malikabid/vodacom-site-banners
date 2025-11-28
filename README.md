@@ -46,7 +46,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 1.0.3** (Current Branch: `feature/v1.0.3-less-styling`)
+**Version 2.0.0** (Current Branch: `feature/v2.0.0-db-models-schema`)
 
 This version demonstrates:
 - Frontend routing configuration (`routes.xml`)
@@ -54,13 +54,14 @@ This version demonstrates:
 - Layout XML file structure (`banners_index_view.xml`)
 - Template file organization with semantic HTML
 - **LESS preprocessor** (`view/frontend/web/css/source/_module.less`)
-- **LESS Variables** for colors, spacing, typography, and dimensions
-- **LESS Mixins** for reusable style patterns (box-shadow, border-radius)
-- **LESS Nesting** for better code organization and hierarchy
-- **LESS Functions** (lighten, darken) for color manipulation
-- **Luma theme integration** with proper LESS compilation
-- Responsive design with mobile-first approach
-- Professional component-based styling
+- **Declarative Schema** (`etc/db_schema.xml`) for database table definition
+- **Model Class** (`Model/Banner.php`) extending AbstractModel with getter/setter methods
+- **Resource Model** (`Model/ResourceModel/Banner.php`) for database operations
+- **Collection Class** (`Model/ResourceModel/Banner/Collection.php`) with filtering methods
+- **ORM Pattern** implementation following Magento 2 best practices
+- Database indexing on `is_active` and `sort_order` columns
+- Timestamps (`created_at`, `updated_at`) with automatic updates
+- Custom collection methods for filtering active banners
 
 ### Accessing the Module
 
@@ -69,7 +70,7 @@ Once installed, visit the banner display page at:
 http://your-magento-site.local/banners/index/view
 ```
 
-The page now features professionally styled banners compiled from LESS sources.
+The page displays banners with LESS styling. Database table is ready for CRUD operations.
 
 ---
 
@@ -77,7 +78,7 @@ The page now features professionally styled banners compiled from LESS sources.
 
 To view a specific concept, switch to the corresponding branch:
 ```bash
-git checkout feature/v1.0.3-less-styling
+git checkout feature/v2.0.0-db-models-schema
 ```
 
 **Important**: This project uses Mark Shust's Docker setup. Run all commands from the workspace root:
@@ -94,7 +95,7 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V1.0.3)
+## Module Structure (V2.0.0)
 
 ```
 Vodacom/SiteBanners/
@@ -102,9 +103,16 @@ Vodacom/SiteBanners/
 │   └── Index/
 │       └── View.php                          # Frontend controller action
 ├── etc/
-│   ├── module.xml                            # Module declaration (v1.0.3)
+│   ├── module.xml                            # Module declaration (v2.0.0)
+│   ├── db_schema.xml                         # Database schema (NEW in V2.0.0)
 │   └── frontend/
 │       └── routes.xml                        # Frontend routing configuration
+├── Model/
+│   ├── Banner.php                            # Banner Model (NEW in V2.0.0)
+│   └── ResourceModel/
+│       ├── Banner.php                        # Banner Resource Model (NEW in V2.0.0)
+│       └── Banner/
+│           └── Collection.php                # Banner Collection (NEW in V2.0.0)
 ├── view/
 │   └── frontend/
 │       ├── layout/
@@ -115,7 +123,7 @@ Vodacom/SiteBanners/
 │       └── web/
 │           └── css/
 │               └── source/
-│                   └── _module.less          # LESS stylesheet (NEW in V1.0.3)
+│                   └── _module.less          # LESS stylesheet
 ├── composer.json                              # Composer package definition
 ├── registration.php                           # Module registration
 └── README.md                                  # This file
@@ -123,28 +131,91 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V1.0.3)
+## Learning Objectives (V2.0.0)
 
 By exploring this version, you will understand:
 
-1. **Routing**: How URLs are mapped to controllers via `routes.xml`
-2. **Controllers**: How to create frontend controller actions
-3. **Layout System**: How layout XML files define page structure and load assets
-4. **Templates**: How to create and organize `.phtml` template files with semantic HTML
-5. **LESS Preprocessor**: How to use LESS for advanced CSS development
-6. **LESS Variables**: Declaring and using variables for colors, spacing, typography
-7. **LESS Mixins**: Creating reusable style patterns and functions
-8. **LESS Nesting**: Organizing styles hierarchically for better maintainability
-9. **LESS Functions**: Using built-in functions like `lighten()`, `darken()` for color manipulation
-10. **Luma Integration**: How LESS files integrate with Magento's Luma theme
-11. **Static Content Deployment**: How Magento compiles LESS to CSS during deployment
-12. **Request Flow**: The complete flow from URL to LESS-compiled styled output
+1. **Declarative Schema**: How to define database tables using `db_schema.xml`
+2. **Database Table Structure**: Column types, constraints, indexes, and primary keys
+3. **Model Layer**: Creating Model classes extending `AbstractModel`
+4. **Resource Model**: Implementing Resource Models for database operations
+5. **Collections**: Building Collection classes for fetching multiple records
+6. **ORM Pattern**: Using Magento's ORM instead of raw SQL queries
+7. **Getter/Setter Methods**: Type-safe data access methods with proper type hints
+8. **Cache Tags**: Implementing cache tags for efficient cache invalidation
+9. **Event Prefixes**: Setting up event prefixes for observers
+10. **Collection Filtering**: Custom methods for filtering data (e.g., active banners)
+11. **Database Indexes**: Optimizing queries with proper indexing strategy
+12. **Timestamps**: Automatic `created_at` and `updated_at` timestamp management
+13. **Setup:Upgrade**: How `setup:upgrade` creates tables from declarative schema
 
 ---
 
 ## Version History
 
-### Version 1.0.3 (Current)
+### Version 2.0.0 (Current)
+**Branch:** `feature/v2.0.0-db-models-schema`  
+**Focus:** Database schema, Models, Resource Models, Collections  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created declarative schema `etc/db_schema.xml` with `vodacom_sitebanners_banner` table
+- Implemented Banner Model extending AbstractModel with full getter/setter methods
+- Created Banner Resource Model for database operations
+- Built Banner Collection with custom filtering methods (`addActiveFilter`, `getActiveBanners`)
+- Added database indexes on `is_active` and `sort_order` for query optimization
+- Implemented automatic timestamp management (`created_at`, `updated_at`)
+- Added cache tags and event prefixes for extensibility
+- Updated module version to 2.0.0
+
+**Files Changed:**
+- `etc/db_schema.xml` - NEW: Database schema definition
+- `Model/Banner.php` - NEW: Banner Model with getter/setter methods
+- `Model/ResourceModel/Banner.php` - NEW: Banner Resource Model
+- `Model/ResourceModel/Banner/Collection.php` - NEW: Banner Collection with filtering
+- `etc/module.xml` - Updated version to 2.0.0
+- `README.md` - Updated documentation with V2.0.0 details
+
+**Key Concepts Demonstrated:**
+- Declarative Schema: XML-based database definition
+- Model-Resource-Collection Pattern: Magento's ORM architecture
+- AbstractModel: Base class for entity models
+- AbstractDb: Base class for resource models
+- AbstractCollection: Base class for collections
+- Type Safety: Strict type hints on all methods
+- Database Optimization: Proper indexing strategy
+
+**Database Schema:**
+```sql
+CREATE TABLE vodacom_sitebanners_banner (
+    banner_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    content TEXT,
+    is_active SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+    sort_order INT NOT NULL DEFAULT 0,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX (is_active),
+    INDEX (sort_order)
+);
+```
+
+**Usage Example:**
+```php
+// Load banner by ID
+$banner = $bannerFactory->create()->load($bannerId);
+
+// Get active banners
+$collection = $bannerCollectionFactory->create()
+    ->getActiveBanners();
+
+// Filter collection
+$collection = $bannerCollectionFactory->create()
+    ->addActiveFilter(true)
+    ->addSortOrderFilter('ASC');
+```
+
+### Version 1.0.3
 **Branch:** `feature/v1.0.3-less-styling`  
 **Focus:** LESS preprocessor and Luma theme integration  
 **Status:** ✅ Completed

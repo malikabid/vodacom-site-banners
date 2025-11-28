@@ -1,31 +1,39 @@
 <?php
+declare(strict_types=1);
+
 namespace Vodacom\SiteBanners\Controller\Index;
 
-class View extends \Magento\Framework\App\Action\Action
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\View\Result\Page;
+
+/**
+ * Controller to display the example banner page.
+ * Corresponds to the URL: /banners/index/view
+ */
+class View implements HttpGetActionInterface
 {
-    /**
-     * @var \Magento\Framework\View\Result\PageFactory
-     */
-    protected $_pageFactory;
+    private ResultFactory $resultFactory;
 
     /**
-     * @param \Magento\Framework\App\Action\Context $context
+     * @param ResultFactory $resultFactory
      */
-    public function __construct(
-       \Magento\Framework\App\Action\Context $context,
-       \Magento\Framework\View\Result\PageFactory $pageFactory
-    )
+    public function __construct(ResultFactory $resultFactory)
     {
-        $this->_pageFactory = $pageFactory;
-        return parent::__construct($context);
+        // ResultFactory is injected via DI to create the Page result object
+        $this->resultFactory = $resultFactory;
     }
+
     /**
-     * View page action
+     * Execute action method
      *
-     * @return \Magento\Framework\Controller\ResultInterface
+     * @return Page
      */
-    public function execute()
+    public function execute(): Page
     {
-        return $this->_pageFactory->create();
+        /** @var Page $resultPage */
+        $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
+        // The page layout handle will be 'banners_index_view'
+        return $resultPage;
     }
 }

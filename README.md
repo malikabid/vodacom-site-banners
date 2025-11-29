@@ -16,7 +16,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 |----------|----------------------------|---------------------------------------------------------------------------|-------------------------------------------|
 | V1.0.0   | Routing, Layout, Blocks    | Request Flow (URL → Controller → Block)                                   | `feature/v1.0.0-routing-layout`           |
 | V1.0.1   | Routing Composition        | Controller Composition Layout Handles, Template Organization              | `feature/v1.0.1-routing-composition`      |
-| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/view-with-css-style`             |
+| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/v1.0.2-view-with-css-style`      |
 | V1.0.3   | LESS Styling               | LESS Preprocessor, Variables, Mixins, Nesting, Luma Integration           | `feature/v1.0.3-less-styling`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
 | V2.0.1   | Schema Patches             | Schema Patches, Database Alterations, Migration Strategy                  | `feature/v2.0.1-schema-patches`           |
@@ -483,7 +483,7 @@ $collection = $bannerCollectionFactory->create()
 4. Clear cache with `bin/magento cache:flush`
 
 ### Version 1.0.2
-**Branch:** `feature/view-with-css-style`  
+**Branch:** `feature/v1.0.2-view-with-css-style`  
 **Focus:** Plain CSS styling for Luma theme compatibility  
 **Status:** ✅ Completed
 

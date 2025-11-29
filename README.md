@@ -104,7 +104,7 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V3.0.0)
+## Module Structure (V3.0.1)
 
 ```
 Vodacom/SiteBanners/
@@ -113,16 +113,22 @@ Vodacom/SiteBanners/
 │   │   └── View.php                          # Frontend controller action
 │   └── Adminhtml/
 │       └── Banner/
-│           └── Index.php                     # Admin controller (NEW in V3.0.0)
+│           └── Index.php                     # Admin controller (V3.0.0)
+├── Ui/
+│   └── Component/
+│       └── Listing/
+│           └── Column/
+│               └── BannerActions.php         # Actions column for grid (NEW in V3.0.1)
 ├── etc/
-│   ├── module.xml                            # Module declaration (v3.0.0)
-│   ├── acl.xml                               # ACL permissions (NEW in V3.0.0)
+│   ├── module.xml                            # Module declaration (v3.0.1)
+│   ├── acl.xml                               # ACL permissions (V3.0.0)
 │   ├── db_schema.xml                         # Database schema
+│   ├── di.xml                                # Dependency injection (NEW in V3.0.1)
 │   ├── frontend/
 │   │   └── routes.xml                        # Frontend routing configuration
 │   └── adminhtml/
-│       ├── routes.xml                        # Admin routing (NEW in V3.0.0)
-│       └── menu.xml                          # Admin menu (NEW in V3.0.0)
+│       ├── routes.xml                        # Admin routing (V3.0.0)
+│       └── menu.xml                          # Admin menu (V3.0.0)
 ├── Model/
 │   ├── Banner.php                            # Banner Model with date scheduling
 │   └── ResourceModel/
@@ -148,10 +154,12 @@ Vodacom/SiteBanners/
 │   │               └── _module.less          # LESS stylesheet
 │   └── adminhtml/
 │       ├── layout/
-│       │   └── vodacom_sitebanners_banner_index.xml  # Admin layout (NEW in V3.0.0)
-│       └── templates/
-│           └── banner/
-│               └── index.phtml               # Admin template (NEW in V3.0.0)
+│       │   └── vodacom_sitebanners_banner_index.xml  # Admin layout (V3.0.0, updated V3.0.1)
+│       ├── templates/
+│       │   └── banner/
+│       │       └── index.phtml               # Admin template (V3.0.0, replaced in V3.0.1)
+│       └── ui_component/
+│           └── vodacom_sitebanners_banner_listing.xml  # Grid UI Component (NEW in V3.0.1)
 ├── composer.json                              # Composer package definition
 ├── registration.php                           # Module registration
 └── README.md                                  # This file
@@ -159,22 +167,23 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V3.0.0)
+## Learning Objectives (V3.0.1)
 
 By exploring this version, you will understand:
 
-1. **Admin Routing**: How to configure admin routes separate from frontend routes
-2. **ACL Resources**: Creating permission hierarchies for role-based access control
-- **Admin Menu Configuration**: Creating custom top-level menu sections and submenus
-4. **Controller Authorization**: Using ADMIN_RESOURCE constant for automatic permission checking
-5. **Admin Controllers**: Extending `Magento\Backend\App\Action` with authorization
-6. **Page Factory**: Creating admin result pages with titles and active menu
-7. **Admin Layout Handles**: Naming convention and structure for admin layouts
-8. **Module Dependencies**: Declaring dependencies on Magento core modules
-9. **Permission Enforcement**: How Magento checks ACL resources automatically
-10. **Admin Template Structure**: Basic admin page layout and messaging
+1. **UI Components Architecture**: XML-based grid configuration system
+2. **Virtual Types**: Creating data providers without concrete classes using di.xml
+3. **Data Provider Pattern**: Connecting UI components to data sources
+4. **Grid Collection**: Using SearchResult interface for grid data
+5. **Column Components**: Different column types (text, date, select, actions)
+6. **Filter Configuration**: Text, date range, and dropdown filters
+7. **Sorting Configuration**: Enabling sorting on grid columns
+8. **Actions Column**: Dynamic Edit/Delete links with URL generation
+9. **Layout Integration**: Replacing template blocks with UI components
+10. **Grid Toolbars**: Bookmark, column controls, search, filters, paging
 
 **Previous Version Learning:**
+- Admin Routing, ACL, Menu Configuration (V3.0.0)
 - Data/Schema Patches (V2.0.1-V2.0.2)
 - Models, Resource Models, Collections (V2.0.0)
 - LESS Styling (V1.0.3)

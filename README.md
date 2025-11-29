@@ -47,18 +47,18 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.0** (Current Branch: `feature/v3.0.0-admin-menu-acl`)
+**Version 3.0.1** (Current Branch: `feature/v3.0.1-grid-ui`)
 
 This version demonstrates:
-- **Admin routing configuration** (`etc/adminhtml/routes.xml`)
-- **ACL (Access Control List)** resources with 3-level permission hierarchy (`etc/acl.xml`)
-- **Custom admin menu section** "Vodacom" with "Site Banners" submenu (`etc/adminhtml/menu.xml`)
-- **Admin controller** with authorization (`Controller/Adminhtml/Banner/Index.php`)
-- **ADMIN_RESOURCE constant** for permission checking
-- **Admin layout XML** (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
-- **Admin template** with placeholder content (`view/adminhtml/templates/banner/index.phtml`)
-- **Module dependencies** including Magento_Backend
-- Foundation for admin UI Components (Grid & Form to be added in V3.0.1-V3.0.3)
+- **Grid UI Component** with full banner listing (`view/adminhtml/ui_component/vodacom_sitebanners_banner_listing.xml`)
+- **Data provider configuration** using virtual types (`etc/di.xml`)
+- **Grid columns** with filters and sorting (ID, Title, Content, Active, Dates, Sort Order, Created)
+- **Actions column** with Edit and Delete links (`Ui/Component/Listing/Column/BannerActions.php`)
+- **Date column rendering** for active_from, active_to, and created_at
+- **Yes/No select filter** for is_active column
+- **Search functionality** across all text fields
+- **Displays sample banners** from V2.0.2 data patches
+- **Module dependencies** including Magento_Ui
 
 **Previous versions included:**
 - Frontend routing, controllers, layouts, templates (V1.0.0-V1.0.1)
@@ -184,7 +184,54 @@ By exploring this version, you will understand:
 
 ## Version History
 
-### Version 3.0.0 (Current)
+### Version 3.0.1 (Current)
+**Branch:** `feature/v3.0.1-grid-ui`  
+**Focus:** Grid UI Component  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Grid UI Component XML (`view/adminhtml/ui_component/vodacom_sitebanners_banner_listing.xml`)
+- Configured data provider using virtual types in di.xml
+- Implemented grid collection with SearchResult interface
+- Created BannerActions column class for Edit/Delete links
+- Updated admin layout to use UI Component instead of template
+- Added all banner columns: ID, Title, Content, Active, Active From/To, Sort Order, Created
+- Implemented filters for all columns (text, date range, yes/no select)
+- Added sorting capability on all columns
+- Integrated with V2.0.2 sample data (displays 5 banners)
+- Added Magento_Ui module dependency
+- Updated module version to 3.0.1
+
+**Files Changed:**
+- `view/adminhtml/ui_component/vodacom_sitebanners_banner_listing.xml` - NEW: Grid UI Component
+- `etc/di.xml` - NEW: Data provider configuration with virtual types
+- `Ui/Component/Listing/Column/BannerActions.php` - NEW: Actions column class
+- `view/adminhtml/layout/vodacom_sitebanners_banner_index.xml` - Updated to use uiComponent
+- `etc/module.xml` - Updated version to 3.0.1, added Magento_Ui dependency
+- `README.md` - Updated documentation with V3.0.1 details
+
+**Key Concepts Demonstrated:**
+- **UI Components Architecture**: XML-based grid configuration
+- **Virtual Types**: Creating data providers without concrete classes
+- **Data Provider Pattern**: Connecting UI components to data sources
+- **Grid Collection**: Using SearchResult interface for grid data
+- **Column Components**: Different column types (text, date, select, actions)
+- **Filter Configuration**: Text, date range, and dropdown filters
+- **Actions Column**: Dynamic Edit/Delete links with confirmation dialogs
+- **Layout Integration**: Replacing template blocks with UI components
+
+**Testing:**
+1. Navigate to **Vodacom > Site Banners** in admin
+2. Should see grid with 5 sample banners from V2.0.2
+3. Test filters (Active, date ranges, search)
+4. Test sorting on all columns
+5. Verify Edit and Delete links appear (will 404 until V3.0.2/V3.0.3)
+
+**Next Steps:**
+- V3.0.2: Add Form UI Component for create/edit functionality
+- V3.0.3: Add CRUD controllers and mass actions
+
+### Version 3.0.0
 **Branch:** `feature/v3.0.0-admin-menu-acl`  
 **Focus:** Admin Menu & ACL Foundation  
 **Status:** ✅ Completed

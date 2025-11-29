@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Dependency Injection Configuration
+ * 
+ * Configures data provider for banner grid UI component.
+ * 
+ * @category  Vodacom
+ * @package   Vodacom_SiteBanners
+ * @version   3.0.1
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    
+    <!-- Grid Data Provider Configuration -->
+    <virtualType name="VodacomSiteBannersGridDataProvider" type="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider">
+        <arguments>
+            <argument name="collection" xsi:type="object" shared="false">Vodacom\SiteBanners\Model\ResourceModel\Banner\Collection</argument>
+            <argument name="filterPool" xsi:type="object" shared="false">VodacomSiteBannersGridFilterPool</argument>
+        </arguments>
+    </virtualType>
+    
+    <!-- Filter Pool for Grid -->
+    <virtualType name="VodacomSiteBannersGridFilterPool" type="Magento\Framework\View\Element\UiComponent\DataProvider\FilterPool">
+        <arguments>
+            <argument name="appliers" xsi:type="array">
+                <item name="regular" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\RegularFilter</item>
+                <item name="fulltext" xsi:type="object">Magento\Framework\View\Element\UiComponent\DataProvider\FulltextFilter</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    
+    <!-- Data Provider Type Configuration -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="vodacom_sitebanners_banner_listing_data_source" xsi:type="string">Vodacom\SiteBanners\Model\ResourceModel\Banner\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <!-- Grid Collection (extends base collection with search result interface) -->
+    <virtualType name="Vodacom\SiteBanners\Model\ResourceModel\Banner\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">vodacom_sitebanners_banner</argument>
+            <argument name="resourceModel" xsi:type="string">Vodacom\SiteBanners\Model\ResourceModel\Banner</argument>
+        </arguments>
+    </virtualType>
+    
+</config>

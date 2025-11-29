@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * ACL Resources Configuration
+ * 
+ * Defines Access Control List resources for Site Banners module.
+ * Creates permission hierarchy:
+ * - Vodacom_SiteBanners::banners - View banners (grid and forms)
+ *   - Vodacom_SiteBanners::banner_save - Create and edit banners
+ *   - Vodacom_SiteBanners::banner_delete - Delete banners
+ * 
+ * @category  Vodacom
+ * @package   Vodacom_SiteBanners
+ * @version   3.0.0
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Content::content">
+                    <resource id="Vodacom_SiteBanners::banners" 
+                              title="Site Banners" 
+                              sortOrder="50">
+                        <resource id="Vodacom_SiteBanners::banner_save" 
+                                  title="Save Banner" 
+                                  sortOrder="10"/>
+                        <resource id="Vodacom_SiteBanners::banner_delete" 
+                                  title="Delete Banner" 
+                                  sortOrder="20"/>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

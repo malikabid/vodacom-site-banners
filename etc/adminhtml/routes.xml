@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Admin Routes Configuration
+ * 
+ * Defines admin routing for Site Banners module.
+ * Routes admin URLs to controllers in Controller/Adminhtml/ directory.
+ * 
+ * @category  Vodacom
+ * @package   Vodacom_SiteBanners
+ * @version   3.0.0
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd">
+    <router id="admin">
+        <route id="vodacom_sitebanners" frontName="vodacom_sitebanners">
+            <module name="Vodacom_SiteBanners" before="Magento_Backend"/>
+        </route>
+    </router>
+</config>

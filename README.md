@@ -16,7 +16,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 |----------|----------------------------|---------------------------------------------------------------------------|-------------------------------------------|
 | V1.0.0   | Routing, Layout, Blocks    | Request Flow (URL → Controller → Block)                                   | `feature/v1.0.0-routing-layout`           |
 | V1.0.1   | Routing Composition        | Controller Composition Layout Handles, Template Organization              | `feature/v1.0.1-routing-composition`      |
-| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/view-with-css-style`             |
+| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/v1.0.2-view-with-css-style`      |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
 | V3.0.0   | Admin UI                   | Admin Menu, ACL, UI Components (Grid & Form)                              | `feature/v3.0.0-admin-uicomponents`       |
 | V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
@@ -45,7 +45,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 1.0.2** (Current Branch: `feature/view-with-css-style`)
+**Version 1.0.2** (Current Branch: `feature/v1.0.2-view-with-css-style`)
 
 This version demonstrates:
 - Frontend routing configuration (`routes.xml`)
@@ -72,7 +72,7 @@ The page now features professionally styled banners with CSS styling.
 
 To view a specific concept, switch to the corresponding branch:
 ```bash
-git checkout feature/view-with-css-style
+git checkout feature/v1.0.2-view-with-css-style
 ```
 
 **Important**: This project uses Mark Shust's Docker setup. Run all commands from the workspace root:

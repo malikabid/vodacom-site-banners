@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Admin Layout for Site Banners Index Page
+ * 
+ * Defines layout structure for vodacom_sitebanners_banner_index admin page.
+ * In V3.0.0: Displays placeholder content.
+ * In V3.0.1: Will be updated to use UI Component grid.
+ * 
+ * @category  Vodacom
+ * @package   Vodacom_SiteBanners
+ * @version   3.0.0
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="styles"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Backend\Block\Template" 
+                   name="vodacom_sitebanners_banner_index" 
+                   template="Vodacom_SiteBanners::banner/index.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

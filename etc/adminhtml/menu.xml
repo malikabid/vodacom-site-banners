@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Admin Menu Configuration
+ * 
+ * Adds "Site Banners" menu entry under Content menu in admin panel.
+ * Routes to vodacom_sitebanners/banner/index controller action.
+ * 
+ * @category  Vodacom
+ * @package   Vodacom_SiteBanners
+ * @version   3.0.0
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Vodacom_SiteBanners::vodacom"
+            title="Vodacom"
+            module="Vodacom_SiteBanners"
+            sortOrder="60"
+            parent="Magento_Backend::content"
+            resource="Vodacom_SiteBanners::banners" />
+        <add id="Vodacom_SiteBanners::banners"
+            title="Site Banners"
+            module="Vodacom_SiteBanners"
+            sortOrder="10"
+            parent="Vodacom_SiteBanners::vodacom"
+            action="vodacom_sitebanners/banner/index"
+            resource="Vodacom_SiteBanners::banners" />
+    </menu>
+</config>

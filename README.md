@@ -16,7 +16,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 |----------|----------------------------|---------------------------------------------------------------------------|-------------------------------------------|
 | V1.0.0   | Routing, Layout, Blocks    | Request Flow (URL → Controller → Block)                                   | `feature/v1.0.0-routing-layout`           |
 | V1.0.1   | Routing Composition        | Controller Composition Layout Handles, Template Organization              | `feature/v1.0.1-routing-composition`      |
-| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/view-with-css-style`             |
+| V1.0.2   | Static Assets & CSS        | Frontend Assets, CSS Styling, requirejs-config.js                         | `feature/v1.0.2-view-with-css-style`      |
 | V1.0.3   | LESS Styling               | LESS Preprocessor, Variables, Mixins, Nesting, Luma Integration           | `feature/v1.0.3-less-styling`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
 | V2.0.1   | Schema Patches             | Schema Patches, Database Alterations, Migration Strategy                  | `feature/v2.0.1-schema-patches`           |
@@ -47,36 +47,39 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 2.0.2** (Current Branch: `feature/v2.0.2-data-patches`)
+**Version 3.0.0** (Current Branch: `feature/v3.0.0-admin-menu-acl`)
 
 This version demonstrates:
-- Frontend routing configuration (`routes.xml`)
-- Controller action implementation (`Controller/Index/View.php`)
-- Layout XML file structure (`banners_index_view.xml`)
-- Template file organization with semantic HTML
-- **LESS preprocessor** (`view/frontend/web/css/source/_module.less`)
-- **Declarative Schema** (`etc/db_schema.xml`) for database table definition
-- **Schema Patches** (`Setup/Patch/Schema/AddActiveDatesToBannerTable.php`) for database alterations
-- **Data Patches** (`Setup/Patch/Data/AddSampleBanners.php`) for database seeding
-- **Model Class** (`Model/Banner.php`) with getter/setter methods including date scheduling
-- **Resource Model** (`Model/ResourceModel/Banner.php`) for database operations
-- **Collection Class** with date-based filtering (`addActiveDateFilter()`)
-- **ORM Pattern** implementation following Magento 2 best practices
-- **Banner Scheduling** with `active_from` and `active_to` datetime columns
-- Date-based activation logic with NULL value handling
-- **Factory + Resource Model pattern** for data insertion
-- Reversible schema changes via `revert()` method
-- Patch tracking in `patch_list` database table
-- **Sample data installation** with 5 diverse banner configurations
+- **Admin routing configuration** (`etc/adminhtml/routes.xml`)
+- **ACL (Access Control List)** resources with 3-level permission hierarchy (`etc/acl.xml`)
+- **Admin menu entry** under Content menu (`etc/adminhtml/menu.xml`)
+- **Admin controller** with authorization (`Controller/Adminhtml/Banner/Index.php`)
+- **ADMIN_RESOURCE constant** for permission checking
+- **Admin layout XML** (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
+- **Admin template** with placeholder content (`view/adminhtml/templates/banner/index.phtml`)
+- **Module dependencies** including Magento_Backend
+- Foundation for admin UI Components (Grid & Form to be added in V3.0.1-V3.0.3)
+
+**Previous versions included:**
+- Frontend routing, controllers, layouts, templates (V1.0.0-V1.0.1)
+- LESS styling with variables and mixins (V1.0.3)
+- Declarative Schema with Models, Resource Models, Collections (V2.0.0)
+- Schema Patches for database alterations (V2.0.1)
+- Data Patches with 5 sample banners (V2.0.2)
 
 ### Accessing the Module
 
-Once installed, visit the banner display page at:
+**Frontend Display:**
+Visit the banner display page at:
 ```
 http://your-magento-site.local/banners/index/view
 ```
 
-The page displays banners with LESS styling. Banners can now be scheduled with activation dates.
+**Admin Panel (V3.0.0+):**
+1. Log into Magento Admin
+2. Navigate to **Content > Site Banners**
+3. You'll see a placeholder page confirming admin foundation is working
+4. In V3.0.1-V3.0.3, this will become a full CRUD interface with grid and forms
 
 ---
 
@@ -101,18 +104,25 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V2.0.2)
+## Module Structure (V3.0.0)
 
 ```
 Vodacom/SiteBanners/
 ├── Controller/
-│   └── Index/
-│       └── View.php                          # Frontend controller action
+│   ├── Index/
+│   │   └── View.php                          # Frontend controller action
+│   └── Adminhtml/
+│       └── Banner/
+│           └── Index.php                     # Admin controller (NEW in V3.0.0)
 ├── etc/
-│   ├── module.xml                            # Module declaration (v2.0.2)
+│   ├── module.xml                            # Module declaration (v3.0.0)
+│   ├── acl.xml                               # ACL permissions (NEW in V3.0.0)
 │   ├── db_schema.xml                         # Database schema
-│   └── frontend/
-│       └── routes.xml                        # Frontend routing configuration
+│   ├── frontend/
+│   │   └── routes.xml                        # Frontend routing configuration
+│   └── adminhtml/
+│       ├── routes.xml                        # Admin routing (NEW in V3.0.0)
+│       └── menu.xml                          # Admin menu (NEW in V3.0.0)
 ├── Model/
 │   ├── Banner.php                            # Banner Model with date scheduling
 │   └── ResourceModel/
@@ -126,16 +136,22 @@ Vodacom/SiteBanners/
 │       └── Data/
 │           └── AddSampleBanners.php          # Data Patch (NEW in V2.0.2)
 ├── view/
-│   └── frontend/
+│   ├── frontend/
+│   │   ├── layout/
+│   │   │   ├── banners_index_view.xml        # Page layout configuration
+│   │   │   └── default.xml                   # Global layout (includes CSS)
+│   │   ├── templates/
+│   │   │   └── view.phtml                    # Frontend template
+│   │   └── web/
+│   │       └── css/
+│   │           └── source/
+│   │               └── _module.less          # LESS stylesheet
+│   └── adminhtml/
 │       ├── layout/
-│       │   ├── banners_index_view.xml        # Page layout configuration
-│       │   └── default.xml                   # Global layout (includes CSS)
-│       ├── templates/
-│       │   └── view.phtml                    # Frontend template
-│       └── web/
-│           └── css/
-│               └── source/
-│                   └── _module.less          # LESS stylesheet
+│       │   └── vodacom_sitebanners_banner_index.xml  # Admin layout (NEW in V3.0.0)
+│       └── templates/
+│           └── banner/
+│               └── index.phtml               # Admin template (NEW in V3.0.0)
 ├── composer.json                              # Composer package definition
 ├── registration.php                           # Module registration
 └── README.md                                  # This file
@@ -143,31 +159,84 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V2.0.2)
+## Learning Objectives (V3.0.0)
 
 By exploring this version, you will understand:
 
-1. **Data Patches**: How to insert/seed data into database using patch classes
-2. **DataPatchInterface**: Implementing the data patch contract properly
-3. **Factory Pattern**: Using Factory classes to create model instances
-4. **Resource Model Pattern**: Using Resource Models to save entities (not `$model->save()`)
-5. **Patch Dependencies**: Data patches depending on schema patches
-6. **Error Handling**: Try-catch blocks with logging for production safety
-7. **Sample Data Strategy**: Creating diverse test data for various use cases
-8. **Patch Lifecycle**: How patches are tracked in `patch_list` table and run once
-7. **DateTime Columns**: Working with NULLABLE datetime fields
-8. **NULL Handling**: Treating NULL values as "no restriction" in business logic
-9. **Date-Based Filtering**: Implementing collection filters with datetime logic
-10. **Model Extensions**: Adding new getter/setter methods to existing models
-11. **Helper Methods**: Creating convenience methods like `isActiveByDate()`
-12. **Migration Strategy**: When to use patches vs declarative schema
-13. **Production Safety**: Safe database modifications for live systems
+1. **Admin Routing**: How to configure admin routes separate from frontend routes
+2. **ACL Resources**: Creating permission hierarchies for role-based access control
+3. **Admin Menu Configuration**: Adding menu items to existing admin sections (Content)
+4. **Controller Authorization**: Using ADMIN_RESOURCE constant for automatic permission checking
+5. **Admin Controllers**: Extending `Magento\Backend\App\Action` with authorization
+6. **Page Factory**: Creating admin result pages with titles and active menu
+7. **Admin Layout Handles**: Naming convention and structure for admin layouts
+8. **Module Dependencies**: Declaring dependencies on Magento core modules
+9. **Permission Enforcement**: How Magento checks ACL resources automatically
+10. **Admin Template Structure**: Basic admin page layout and messaging
+
+**Previous Version Learning:**
+- Data/Schema Patches (V2.0.1-V2.0.2)
+- Models, Resource Models, Collections (V2.0.0)
+- LESS Styling (V1.0.3)
+- Frontend Routing & Controllers (V1.0.0-V1.0.1)
 
 ---
 
 ## Version History
 
-### Version 2.0.2 (Current)
+### Version 3.0.0 (Current)
+**Branch:** `feature/v3.0.0-admin-menu-acl`  
+**Focus:** Admin Menu & ACL Foundation  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created admin routing configuration (`etc/adminhtml/routes.xml`)
+- Implemented ACL resources with 3-level permission hierarchy (`etc/acl.xml`):
+  - `Vodacom_SiteBanners::banners` - View banners (parent permission)
+  - `Vodacom_SiteBanners::banner_save` - Save/edit banners
+  - `Vodacom_SiteBanners::banner_delete` - Delete banners
+- Added admin menu entry under Content menu (`etc/adminhtml/menu.xml`)
+- Created Index controller with authorization (`Controller/Adminhtml/Banner/Index.php`)
+- Implemented ADMIN_RESOURCE constant for permission enforcement
+- Created admin layout XML (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
+- Added placeholder admin template (`view/adminhtml/templates/banner/index.phtml`)
+- Added Magento_Backend module dependency
+- Updated module version to 3.0.0
+
+**Files Changed:**
+- `etc/adminhtml/routes.xml` - NEW: Admin routing configuration
+- `etc/acl.xml` - NEW: ACL permission hierarchy
+- `etc/adminhtml/menu.xml` - NEW: Admin menu entry
+- `Controller/Adminhtml/Banner/Index.php` - NEW: Admin controller
+- `view/adminhtml/layout/vodacom_sitebanners_banner_index.xml` - NEW: Admin layout
+- `view/adminhtml/templates/banner/index.phtml` - NEW: Admin template (placeholder)
+- `etc/module.xml` - Updated version to 3.0.0, added Magento_Backend dependency
+- `README.md` - Updated documentation with V3.0.0 details
+
+**Key Concepts Demonstrated:**
+- **Admin Routing**: Separate routing for admin area (`adminhtml/routes.xml`)
+- **ACL Resources**: Permission hierarchy for role-based access control
+- **Admin Menu Configuration**: Adding menu items to existing admin sections
+- **Authorization**: Using ADMIN_RESOURCE constant to enforce permissions
+- **Controller Authorization**: Automatic permission checking via `_isAllowed()` method
+- **Admin Page Factory**: Creating admin result pages
+- **Admin Layout Handles**: Naming convention for admin layouts
+- **Module Dependencies**: Declaring dependency on Magento_Backend
+
+**Testing Admin Access:**
+1. Log into Magento Admin Panel
+2. Navigate to **Content > Site Banners**
+3. Should see placeholder page with V3.0.0 confirmation message
+4. Verify permission enforcement:
+   - Admin user needs `Vodacom_SiteBanners::banners` permission
+   - Check in System > Permissions > User Roles
+
+**Next Steps:**
+- V3.0.1: Add Grid UI Component to display sample banners from V2.0.2
+- V3.0.2: Add Form UI Component for create/edit functionality
+- V3.0.3: Add CRUD controllers and mass actions
+
+### Version 2.0.2
 **Branch:** `feature/v2.0.2-data-patches`  
 **Focus:** Data Patches for database seeding  
 **Status:** ✅ Completed
@@ -414,7 +483,7 @@ $collection = $bannerCollectionFactory->create()
 4. Clear cache with `bin/magento cache:flush`
 
 ### Version 1.0.2
-**Branch:** `feature/view-with-css-style`  
+**Branch:** `feature/v1.0.2-view-with-css-style`  
 **Focus:** Plain CSS styling for Luma theme compatibility  
 **Status:** ✅ Completed
 

@@ -52,7 +52,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 This version demonstrates:
 - **Admin routing configuration** (`etc/adminhtml/routes.xml`)
 - **ACL (Access Control List)** resources with 3-level permission hierarchy (`etc/acl.xml`)
-- **Admin menu entry** under Content menu (`etc/adminhtml/menu.xml`)
+- **Custom admin menu section** "Vodacom" with "Site Banners" submenu (`etc/adminhtml/menu.xml`)
 - **Admin controller** with authorization (`Controller/Adminhtml/Banner/Index.php`)
 - **ADMIN_RESOURCE constant** for permission checking
 - **Admin layout XML** (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
@@ -77,7 +77,7 @@ http://your-magento-site.local/banners/index/view
 
 **Admin Panel (V3.0.0+):**
 1. Log into Magento Admin
-2. Navigate to **Content > Site Banners**
+2. Navigate to **Vodacom > Site Banners** (custom top-level menu)
 3. You'll see a placeholder page confirming admin foundation is working
 4. In V3.0.1-V3.0.3, this will become a full CRUD interface with grid and forms
 
@@ -165,7 +165,7 @@ By exploring this version, you will understand:
 
 1. **Admin Routing**: How to configure admin routes separate from frontend routes
 2. **ACL Resources**: Creating permission hierarchies for role-based access control
-3. **Admin Menu Configuration**: Adding menu items to existing admin sections (Content)
+- **Admin Menu Configuration**: Creating custom top-level menu sections and submenus
 4. **Controller Authorization**: Using ADMIN_RESOURCE constant for automatic permission checking
 5. **Admin Controllers**: Extending `Magento\Backend\App\Action` with authorization
 6. **Page Factory**: Creating admin result pages with titles and active menu
@@ -195,7 +195,8 @@ By exploring this version, you will understand:
   - `Vodacom_SiteBanners::banners` - View banners (parent permission)
   - `Vodacom_SiteBanners::banner_save` - Save/edit banners
   - `Vodacom_SiteBanners::banner_delete` - Delete banners
-- Added admin menu entry under Content menu (`etc/adminhtml/menu.xml`)
+- Created custom "Vodacom" top-level admin menu section (`etc/adminhtml/menu.xml`)
+- Added "Site Banners" submenu under Vodacom section
 - Created Index controller with authorization (`Controller/Adminhtml/Banner/Index.php`)
 - Implemented ADMIN_RESOURCE constant for permission enforcement
 - Created admin layout XML (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
@@ -225,8 +226,9 @@ By exploring this version, you will understand:
 
 **Testing Admin Access:**
 1. Log into Magento Admin Panel
-2. Navigate to **Content > Site Banners**
+2. Navigate to **Vodacom > Site Banners** (custom top-level menu)
 3. Should see placeholder page with V3.0.0 confirmation message
+4. Verify "Vodacom" appears as a top-level menu item in admin navigation
 4. Verify permission enforcement:
    - Admin user needs `Vodacom_SiteBanners::banners` permission
    - Check in System > Permissions > User Roles

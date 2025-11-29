@@ -19,7 +19,7 @@
     <acl>
         <resources>
             <resource id="Magento_Backend::admin">
-                <resource id="Magento_Content::content">
+                <resource id="Magento_Backend::content">
                     <resource id="Vodacom_SiteBanners::banners" 
                               title="Site Banners" 
                               sortOrder="50">

@@ -11,15 +11,21 @@
  * @version   3.0.0
  */
 -->
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <add id="Vodacom_SiteBanners::banners" 
-             title="Site Banners" 
-             module="Vodacom_SiteBanners" 
-             sortOrder="50" 
-             parent="Magento_Content::content" 
-             action="vodacom_sitebanners/banner/index" 
-             resource="Vodacom_SiteBanners::banners"/>
+        <add id="Vodacom_SiteBanners::vodacom"
+            title="Vodacom"
+            module="Vodacom_SiteBanners"
+            sortOrder="60"
+            parent="Magento_Backend::content"
+            resource="Vodacom_SiteBanners::banners" />
+        <add id="Vodacom_SiteBanners::banners"
+            title="Site Banners"
+            module="Vodacom_SiteBanners"
+            sortOrder="10"
+            parent="Vodacom_SiteBanners::vodacom"
+            action="vodacom_sitebanners/banner/index"
+            resource="Vodacom_SiteBanners::banners" />
     </menu>
 </config>

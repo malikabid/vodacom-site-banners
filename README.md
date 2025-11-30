@@ -26,7 +26,9 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V3.0.2   | Form UI Component          | Form Configuration, DataProvider, Button Classes, Field Validation        | `feature/v3.0.2-form-ui`                  |
 | V3.0.3   | CRUD & Mass Actions        | Save/Delete Controllers, Mass Actions, Inline Editing                     | `feature/v3.0.3-crud-mass-actions`        |
 | V3.0.4   | PageBuilder/WYSIWYG        | WYSIWYG Editor, Page Builder Integration, Content Filtering              | `feature/v3.0.4-pagebuilder-wysiwyg`      |
-| V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
+| V4.0.1   | Data Interfaces            | BannerInterface, Service Contracts, Type Safety, DI Preferences           | `feature/v4.0.1-data-interfaces`          |
+| V4.0.2   | Repository Pattern         | Repository, SearchCriteria, Data Abstraction Layer                        | `feature/v4.0.2-repository-pattern`       |
+| V4.0.3   | REST API                   | webapi.xml, REST Endpoints, API Authentication                            | `feature/v4.0.3-rest-api`                 |
 | V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
 | V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
 
@@ -52,9 +54,59 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.4** (Current Branch: `feature/v3.0.4-pagebuilder-wysiwyg`) ✅ **Completed**
+**Version 4.0.3** (Current Branch: `feature/v4.0.3-rest-api`) ✅ **Completed**
 
-This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
+This version demonstrates **REST API Exposure**:
+
+### REST API Features
+- **Complete CRUD Operations via REST**:
+  - `GET /V1/vodacom/banners/:bannerId` - Retrieve single banner
+  - `GET /V1/vodacom/banners` - List banners with SearchCriteria
+  - `POST /V1/vodacom/banners` - Create new banner
+  - `PUT /V1/vodacom/banners/:bannerId` - Update existing banner
+  - `DELETE /V1/vodacom/banners/:bannerId` - Delete banner
+- **Authentication**:
+  - OAuth 1.0a support
+  - Token-based authentication via Integration tokens
+  - ACL-based permissions for fine-grained access control
+- **SearchCriteria Support**:
+  - Complex filtering (eq, neq, gt, lt, like, in, etc.)
+  - Pagination (currentPage, pageSize)
+  - Sorting (field, direction)
+  - Multiple filter groups
+- **API Documentation**:
+  - Comprehensive `README-API.md` with usage examples
+  - curl command examples for all endpoints
+  - Postman collection guidance
+  - Error handling documentation
+  - Security best practices
+
+### ACL Resources (Updated)
+- **API-Specific Permissions**:
+  - `Vodacom_SiteBanners::banner_view` - View banners via API
+  - `Vodacom_SiteBanners::banner_api_save` - Create/Update via API
+  - `Vodacom_SiteBanners::banner_api_delete` - Delete via API
+- **Separate from Admin Permissions**:
+  - API resources under `Magento_Backend::content_api`
+  - Admin resources under `Magento_Backend::content`
+  - Allows different permission sets for admin UI vs API
+
+### Configuration Files
+- **etc/webapi.xml**: Maps HTTP methods to repository operations
+- **etc/acl.xml**: Defines API resource hierarchy
+- **README-API.md**: Complete API documentation with examples
+
+### Key Benefits
+- **Leverages V4.0.2 Repository**: No new business logic needed
+- **Standard Magento REST**: Compatible with existing API clients
+- **Fully Documented**: Ready for integration with external systems
+- **Secure by Default**: ACL permissions enforced on all endpoints
+
+---
+
+## Previous Version Features
+
+**Version 3.0.4** - **Page Builder and WYSIWYG Editor Integration**:
 
 ### Admin Features (Page Builder)
 - **WYSIWYG Editor** with TinyMCE integration
@@ -128,7 +180,213 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 
 ## Version History
 
-### Version 3.0.4 (Current)
+### Version 4.0.3 (Current)
+**Branch:** `feature/v4.0.3-rest-api`  
+**Focus:** REST API Exposure  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `etc/webapi.xml` with REST endpoint mappings for all CRUD operations
+- Updated `etc/acl.xml` with API-specific resource permissions
+- Created comprehensive `README-API.md` with usage examples and curl commands
+- Updated module version to 4.0.3
+- Exposed repository via 5 REST endpoints:
+  - GET /V1/vodacom/banners/:bannerId - Retrieve single banner
+  - GET /V1/vodacom/banners - List with SearchCriteria support
+  - POST /V1/vodacom/banners - Create new banner
+  - PUT /V1/vodacom/banners/:bannerId - Update existing banner
+  - DELETE /V1/vodacom/banners/:bannerId - Delete banner
+
+**Files Created:**
+- `etc/webapi.xml` - REST API route configuration
+- `README-API.md` - Complete API documentation (450+ lines)
+
+**Files Modified:**
+- `etc/acl.xml` - Added API resource permissions (banner_view, banner_api_save, banner_api_delete)
+- `etc/module.xml` - Updated version to 4.0.3
+
+**Key Concepts Demonstrated:**
+- **REST API Configuration**: webapi.xml maps HTTP verbs to repository methods
+- **API Authentication**: OAuth 1.0a and token-based authentication
+- **ACL for APIs**: Separate permissions for API vs admin UI
+- **SearchCriteria via REST**: Complex queries through URL parameters
+- **Zero Business Logic**: Leverages existing repository from V4.0.2
+- **API Documentation**: Professional README-API.md with examples
+
+**API Endpoints:**
+```xml
+<!-- Get single banner -->
+<route url="/V1/vodacom/banners/:bannerId" method="GET">
+    <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="getById"/>
+    <resources><resource ref="Vodacom_SiteBanners::banner_view"/></resources>
+</route>
+
+<!-- List banners with SearchCriteria -->
+<route url="/V1/vodacom/banners" method="GET">
+    <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="getList"/>
+    <resources><resource ref="Vodacom_SiteBanners::banner_view"/></resources>
+</route>
+
+<!-- Create banner -->
+<route url="/V1/vodacom/banners" method="POST">
+    <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="save"/>
+    <resources><resource ref="Vodacom_SiteBanners::banner_api_save"/></resources>
+</route>
+```
+
+**Usage Example:**
+```bash
+# Create integration in admin: System > Extensions > Integrations
+# Get access token and use in API calls
+
+# Get banner by ID
+curl -X GET "https://your-store.com/rest/V1/vodacom/banners/1" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json"
+
+# Create new banner
+curl -X POST "https://your-store.com/rest/V1/vodacom/banners" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"banner": {"title": "New Banner", "content": "Content here", "is_active": 1}}'
+
+# List active banners with SearchCriteria
+curl -X GET "https://your-store.com/rest/V1/vodacom/banners?searchCriteria[filterGroups][0][filters][0][field]=is_active&searchCriteria[filterGroups][0][filters][0][value]=1" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Benefits:**
+- **Zero Custom Code**: Pure configuration, leverages existing repository
+- **Standard Magento REST**: Compatible with existing API clients
+- **Complete Documentation**: README-API.md has 450+ lines of examples
+- **Secure**: ACL-based permissions enforced
+- **Ready for Integration**: External systems can manage banners programmatically
+- **SearchCriteria Support**: Complex filtering, sorting, pagination via URL params
+
+**Next Steps:** V5.0.0 will demonstrate Dependency Injection, Factories, and ViewModels
+
+---
+
+### Version 4.0.2
+**Branch:** `feature/v4.0.2-repository-pattern`  
+**Focus:** Repository Pattern & SearchCriteria  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `Api/BannerRepositoryInterface` with full CRUD + getList methods
+- Implemented `Model/BannerRepository` with SearchCriteria support
+- Added instance caching in repository for performance optimization
+- Refactored `Save` controller to use repository instead of ResourceModel
+- Refactored `Delete` controller to use repository's `deleteById()` method
+- Refactored `MassDelete` controller to use repository's `delete()` method
+- Updated `etc/di.xml` with repository preference binding
+- Updated module version to 4.0.2
+
+**Files Created:**
+- `Api/BannerRepositoryInterface.php` - Repository contract with save, getById, delete, deleteById, getList
+- `Model/BannerRepository.php` - Repository implementation with CollectionProcessor support
+
+**Files Modified:**
+- `Controller/Adminhtml/Banner/Save.php` - Use BannerRepositoryInterface instead of ResourceModel
+- `Controller/Adminhtml/Banner/Delete.php` - Use repository deleteById() method
+- `Controller/Adminhtml/Banner/MassDelete.php` - Use repository delete() method
+- `etc/di.xml` - Added BannerRepositoryInterface preference
+- `etc/module.xml` - Updated version to 4.0.2
+
+**Key Concepts Demonstrated:**
+- **Repository Pattern**: Complete data abstraction layer
+- **SearchCriteria Support**: Using CollectionProcessor for complex queries
+- **Instance Caching**: Repository caches loaded entities to prevent duplicate queries
+- **Exception Handling**: CouldNotSaveException, CouldNotDeleteException, NoSuchEntityException
+- **Service Layer Separation**: Controllers no longer know about database/ResourceModel
+- **Interface-Based Development**: All operations through BannerRepositoryInterface
+- **Dependency Injection**: Proper constructor injection of repository interface
+
+**Repository Methods:**
+```php
+public function save(BannerInterface $banner): BannerInterface;
+public function getById(int $bannerId): BannerInterface;
+public function getList(SearchCriteriaInterface $searchCriteria): BannerSearchResultsInterface;
+public function delete(BannerInterface $banner): bool;
+public function deleteById(int $bannerId): bool;
+```
+
+**Usage Example:**
+```php
+// Before V4.0.2 (direct ResourceModel)
+public function __construct(
+    BannerFactory $bannerFactory,
+    BannerResource $bannerResource
+) {}
+
+// After V4.0.2 (repository pattern)
+public function __construct(
+    BannerRepositoryInterface $bannerRepository
+) {}
+```
+
+**Benefits:**
+- Complete abstraction from database implementation
+- Easy to mock for unit tests
+- SearchCriteria enables complex filtering without SQL
+- Foundation for REST API (V4.0.3)
+- Follows Magento 2 best practices
+
+**Next Steps:** V4.0.3 will expose repository via REST API using webapi.xml
+
+---
+
+### Version 4.0.1
+**Branch:** `feature/v4.0.1-data-interfaces`  
+**Focus:** Data Interfaces & Service Contracts  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `Api/Data/BannerInterface` with all getter/setter method contracts
+- Created `Api/Data/BannerSearchResultsInterface` for repository pattern
+- Updated `Model/Banner` to implement `BannerInterface`
+- Refactored all model methods to use interface constants (BANNER_ID, TITLE, etc.)
+- Fixed return types to match interface specifications (nullable where appropriate)
+- Added DI preferences in `etc/di.xml` for interface binding
+- Updated module version to 4.0.1
+
+**Files Changed:**
+- `Api/Data/BannerInterface.php` - NEW: Data contract interface with all banner fields
+- `Api/Data/BannerSearchResultsInterface.php` - NEW: Search results interface
+- `Model/Banner.php` - Updated to implement BannerInterface, use constants, fixed return types
+- `etc/di.xml` - Added interface-to-implementation preferences
+- `etc/module.xml` - Updated version to 4.0.1
+
+**Key Concepts Demonstrated:**
+- **Service Contracts**: @api annotation for stable public interfaces
+- **Type Safety**: Strict type declarations on all methods
+- **Interface Constants**: Using constants instead of magic strings for data keys
+- **Nullable Types**: Proper use of `?int`, `?string`, `?bool` for optional fields
+- **DI Preferences**: Binding interfaces to concrete implementations
+- **Backward Compatibility**: All existing functionality preserved
+- **API Readiness**: Foundation for REST/SOAP API exposure (V4.0.3)
+- **Return Type Covariance**: Methods return BannerInterface instead of self
+
+**Usage Example:**
+```php
+// Before V4.0.1 (concrete class)
+public function __construct(Banner $banner) {}
+
+// After V4.0.1 (interface - preferred)
+public function __construct(BannerInterface $banner) {}
+```
+
+**Interface Compliance:**
+- All admin CRUD operations work identically to V3.0.4
+- No breaking changes to existing functionality
+- Models now satisfy service contract requirements
+- Ready for repository pattern implementation (V4.0.2)
+
+**Next Steps:** V4.0.2 will implement Repository Pattern and SearchCriteria for data abstraction.
+
+---
+
+### Version 3.0.4
 **Branch:** `feature/v3.0.4-pagebuilder-wysiwyg`  
 **Focus:** Page Builder and WYSIWYG Editor Integration  
 **Status:** ✅ Completed

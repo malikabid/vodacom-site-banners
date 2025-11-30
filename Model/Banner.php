@@ -9,14 +9,19 @@ declare(strict_types=1);
 namespace Vodacom\SiteBanners\Model;
 
 use Magento\Framework\Model\AbstractModel;
+use Vodacom\SiteBanners\Api\Data\BannerInterface;
 use Vodacom\SiteBanners\Model\ResourceModel\Banner as BannerResource;
 
 /**
  * Banner Model
  *
- * Represents a site banner entity
+ * Represents a site banner entity.
+ * Implements BannerInterface for service contract compliance.
+ * 
+ * @method \Vodacom\SiteBanners\Model\ResourceModel\Banner getResource()
+ * @method \Vodacom\SiteBanners\Model\ResourceModel\Banner\Collection getCollection()
  */
-class Banner extends AbstractModel
+class Banner extends AbstractModel implements BannerInterface
 {
     /**
      * Cache tag for banner
@@ -44,192 +49,150 @@ class Banner extends AbstractModel
     }
 
     /**
-     * Get Banner ID
-     *
-     * @return int|null
+     * @inheritdoc
      */
     public function getBannerId(): ?int
     {
-        return $this->getData('banner_id') ? (int)$this->getData('banner_id') : null;
+        $value = $this->getData(self::BANNER_ID);
+        return $value !== null ? (int)$value : null;
     }
 
     /**
-     * Set Banner ID
-     *
-     * @param int $bannerId
-     * @return $this
+     * @inheritdoc
      */
-    public function setBannerId(int $bannerId): self
+    public function setBannerId(int $bannerId): BannerInterface
     {
-        return $this->setData('banner_id', $bannerId);
+        return $this->setData(self::BANNER_ID, $bannerId);
     }
 
     /**
-     * Get Title
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getTitle(): ?string
     {
-        return $this->getData('title');
+        return $this->getData(self::TITLE);
     }
 
     /**
-     * Set Title
-     *
-     * @param string $title
-     * @return $this
+     * @inheritdoc
      */
-    public function setTitle(string $title): self
+    public function setTitle(string $title): BannerInterface
     {
-        return $this->setData('title', $title);
+        return $this->setData(self::TITLE, $title);
     }
 
     /**
-     * Get Content
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getContent(): ?string
     {
-        return $this->getData('content');
+        return $this->getData(self::CONTENT);
     }
 
     /**
-     * Set Content
-     *
-     * @param string|null $content
-     * @return $this
+     * @inheritdoc
      */
-    public function setContent(?string $content): self
+    public function setContent(string $content): BannerInterface
     {
-        return $this->setData('content', $content);
+        return $this->setData(self::CONTENT, $content);
     }
 
     /**
-     * Get Is Active
-     *
-     * @return bool
+     * @inheritdoc
      */
-    public function getIsActive(): bool
+    public function getIsActive(): ?bool
     {
-        return (bool)$this->getData('is_active');
+        $value = $this->getData(self::IS_ACTIVE);
+        return $value !== null ? (bool)$value : null;
     }
 
     /**
-     * Set Is Active
-     *
-     * @param bool $isActive
-     * @return $this
+     * @inheritdoc
      */
-    public function setIsActive(bool $isActive): self
+    public function setIsActive(bool $isActive): BannerInterface
     {
-        return $this->setData('is_active', $isActive);
+        return $this->setData(self::IS_ACTIVE, $isActive);
     }
 
     /**
-     * Get Sort Order
-     *
-     * @return int
+     * @inheritdoc
      */
-    public function getSortOrder(): int
+    public function getSortOrder(): ?int
     {
-        return (int)$this->getData('sort_order');
+        $value = $this->getData(self::SORT_ORDER);
+        return $value !== null ? (int)$value : null;
     }
 
     /**
-     * Set Sort Order
-     *
-     * @param int $sortOrder
-     * @return $this
+     * @inheritdoc
      */
-    public function setSortOrder(int $sortOrder): self
+    public function setSortOrder(int $sortOrder): BannerInterface
     {
-        return $this->setData('sort_order', $sortOrder);
+        return $this->setData(self::SORT_ORDER, $sortOrder);
     }
 
     /**
-     * Get Created At
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getCreatedAt(): ?string
     {
-        return $this->getData('created_at');
+        return $this->getData(self::CREATED_AT);
     }
 
     /**
-     * Set Created At
-     *
-     * @param string $createdAt
-     * @return $this
+     * @inheritdoc
      */
-    public function setCreatedAt(string $createdAt): self
+    public function setCreatedAt(string $createdAt): BannerInterface
     {
-        return $this->setData('created_at', $createdAt);
+        return $this->setData(self::CREATED_AT, $createdAt);
     }
 
     /**
-     * Get Updated At
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getUpdatedAt(): ?string
     {
-        return $this->getData('updated_at');
+        return $this->getData(self::UPDATED_AT);
     }
 
     /**
-     * Set Updated At
-     *
-     * @param string $updatedAt
-     * @return $this
+     * @inheritdoc
      */
-    public function setUpdatedAt(string $updatedAt): self
+    public function setUpdatedAt(string $updatedAt): BannerInterface
     {
-        return $this->setData('updated_at', $updatedAt);
+        return $this->setData(self::UPDATED_AT, $updatedAt);
     }
 
     /**
-     * Get Active From
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getActiveFrom(): ?string
     {
-        return $this->getData('active_from');
+        return $this->getData(self::ACTIVE_FROM);
     }
 
     /**
-     * Set Active From
-     *
-     * @param string|null $activeFrom
-     * @return $this
+     * @inheritdoc
      */
-    public function setActiveFrom(?string $activeFrom): self
+    public function setActiveFrom(?string $activeFrom): BannerInterface
     {
-        return $this->setData('active_from', $activeFrom);
+        return $this->setData(self::ACTIVE_FROM, $activeFrom);
     }
 
     /**
-     * Get Active To
-     *
-     * @return string|null
+     * @inheritdoc
      */
     public function getActiveTo(): ?string
     {
-        return $this->getData('active_to');
+        return $this->getData(self::ACTIVE_TO);
     }
 
     /**
-     * Set Active To
-     *
-     * @param string|null $activeTo
-     * @return $this
+     * @inheritdoc
      */
-    public function setActiveTo(?string $activeTo): self
+    public function setActiveTo(?string $activeTo): BannerInterface
     {
-        return $this->setData('active_to', $activeTo);
+        return $this->setData(self::ACTIVE_TO, $activeTo);
     }
 
     /**

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Vodacom. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    
+    <!-- GET /V1/vodacom/banners/:bannerId - Get banner by ID -->
+    <route url="/V1/vodacom/banners/:bannerId" method="GET">
+        <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="Vodacom_SiteBanners::banner_view"/>
+        </resources>
+    </route>
+    
+    <!-- GET /V1/vodacom/banners - Get list of banners with search criteria -->
+    <route url="/V1/vodacom/banners" method="GET">
+        <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="Vodacom_SiteBanners::banner_view"/>
+        </resources>
+    </route>
+    
+    <!-- POST /V1/vodacom/banners - Create new banner -->
+    <route url="/V1/vodacom/banners" method="POST">
+        <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vodacom_SiteBanners::banner_api_save"/>
+        </resources>
+    </route>
+    
+    <!-- PUT /V1/vodacom/banners/:bannerId - Update existing banner -->
+    <route url="/V1/vodacom/banners/:bannerId" method="PUT">
+        <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="Vodacom_SiteBanners::banner_api_save"/>
+        </resources>
+    </route>
+    
+    <!-- DELETE /V1/vodacom/banners/:bannerId - Delete banner by ID -->
+    <route url="/V1/vodacom/banners/:bannerId" method="DELETE">
+        <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="Vodacom_SiteBanners::banner_api_delete"/>
+        </resources>
+    </route>
+    
+</routes>

@@ -8,11 +8,13 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Ui\Component\MassAction\Filter;
+use Vodacom\SiteBanners\Api\BannerRepositoryInterface;
 use Vodacom\SiteBanners\Model\ResourceModel\Banner\CollectionFactory;
-use Vodacom\SiteBanners\Model\ResourceModel\Banner as BannerResource;
 
 /**
  * Mass Delete Banner Controller
+ * 
+ * V4.0.2: Refactored to use Repository Pattern instead of direct ResourceModel access
  */
 class MassDelete extends Action
 {
@@ -32,26 +34,26 @@ class MassDelete extends Action
     private CollectionFactory $collectionFactory;
 
     /**
-     * @var BannerResource
+     * @var BannerRepositoryInterface
      */
-    private BannerResource $bannerResource;
+    private BannerRepositoryInterface $bannerRepository;
 
     /**
      * @param Context $context
      * @param Filter $filter
      * @param CollectionFactory $collectionFactory
-     * @param BannerResource $bannerResource
+     * @param BannerRepositoryInterface $bannerRepository
      */
     public function __construct(
         Context $context,
         Filter $filter,
         CollectionFactory $collectionFactory,
-        BannerResource $bannerResource
+        BannerRepositoryInterface $bannerRepository
     ) {
         parent::__construct($context);
         $this->filter = $filter;
         $this->collectionFactory = $collectionFactory;
-        $this->bannerResource = $bannerResource;
+        $this->bannerRepository = $bannerRepository;
     }
 
     /**
@@ -62,12 +64,12 @@ class MassDelete extends Action
     public function execute(): ResultInterface
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
-        $collectionSize = $collection->getSize();
         $deletedCount = 0;
 
         try {
             foreach ($collection as $banner) {
-                $this->bannerResource->delete($banner);
+                // Use repository to delete banner
+                $this->bannerRepository->delete($banner);
                 $deletedCount++;
             }
 

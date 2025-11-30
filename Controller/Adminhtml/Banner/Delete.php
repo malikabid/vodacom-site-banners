@@ -6,11 +6,12 @@ namespace Vodacom\SiteBanners\Controller\Adminhtml\Banner;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\ResultInterface;
-use Vodacom\SiteBanners\Model\BannerFactory;
-use Vodacom\SiteBanners\Model\ResourceModel\Banner as BannerResource;
+use Vodacom\SiteBanners\Api\BannerRepositoryInterface;
 
 /**
  * Delete Banner Controller
+ * 
+ * V4.0.2: Refactored to use Repository Pattern instead of direct ResourceModel access
  */
 class Delete extends Action
 {
@@ -20,28 +21,20 @@ class Delete extends Action
     const ADMIN_RESOURCE = 'Vodacom_SiteBanners::banner_delete';
 
     /**
-     * @var BannerFactory
+     * @var BannerRepositoryInterface
      */
-    private BannerFactory $bannerFactory;
-
-    /**
-     * @var BannerResource
-     */
-    private BannerResource $bannerResource;
+    private BannerRepositoryInterface $bannerRepository;
 
     /**
      * @param Context $context
-     * @param BannerFactory $bannerFactory
-     * @param BannerResource $bannerResource
+     * @param BannerRepositoryInterface $bannerRepository
      */
     public function __construct(
         Context $context,
-        BannerFactory $bannerFactory,
-        BannerResource $bannerResource
+        BannerRepositoryInterface $bannerRepository
     ) {
         parent::__construct($context);
-        $this->bannerFactory = $bannerFactory;
-        $this->bannerResource = $bannerResource;
+        $this->bannerRepository = $bannerRepository;
     }
 
     /**
@@ -56,15 +49,8 @@ class Delete extends Action
 
         if ($id) {
             try {
-                $banner = $this->bannerFactory->create();
-                $this->bannerResource->load($banner, $id);
-
-                if (!$banner->getId()) {
-                    $this->messageManager->addErrorMessage(__('This banner no longer exists.'));
-                    return $resultRedirect->setPath('*/*/');
-                }
-
-                $this->bannerResource->delete($banner);
+                // Use repository to delete by ID
+                $this->bannerRepository->deleteById((int)$id);
                 $this->messageManager->addSuccessMessage(__('The banner has been deleted.'));
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());

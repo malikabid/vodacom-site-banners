@@ -11,7 +11,7 @@
  * 
  * @category  Vodacom
  * @package   Vodacom_SiteBanners
- * @version   3.0.0
+ * @version   4.0.3
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
@@ -29,6 +29,16 @@
                         <resource id="Vodacom_SiteBanners::banner_delete" 
                                   title="Delete Banner" 
                                   sortOrder="20"/>
+                        <!-- API Resources - nested under banners -->
+                        <resource id="Vodacom_SiteBanners::banner_view" 
+                                  title="View Banners via API" 
+                                  sortOrder="30"/>
+                        <resource id="Vodacom_SiteBanners::banner_api_save" 
+                                  title="Save Banners via API" 
+                                  sortOrder="40"/>
+                        <resource id="Vodacom_SiteBanners::banner_api_delete" 
+                                  title="Delete Banners via API" 
+                                  sortOrder="50"/>
                     </resource>
                 </resource>
             </resource>

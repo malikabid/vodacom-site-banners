@@ -26,7 +26,9 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V3.0.2   | Form UI Component          | Form Configuration, DataProvider, Button Classes, Field Validation        | `feature/v3.0.2-form-ui`                  |
 | V3.0.3   | CRUD & Mass Actions        | Save/Delete Controllers, Mass Actions, Inline Editing                     | `feature/v3.0.3-crud-mass-actions`        |
 | V3.0.4   | PageBuilder/WYSIWYG        | WYSIWYG Editor, Page Builder Integration, Content Filtering              | `feature/v3.0.4-pagebuilder-wysiwyg`      |
-| V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
+| V4.0.1   | Data Interfaces            | BannerInterface, Service Contracts, Type Safety, DI Preferences           | `feature/v4.0.1-data-interfaces`          |
+| V4.0.2   | Repository Pattern         | Repository, SearchCriteria, Data Abstraction Layer                        | `feature/v4.0.2-repository-pattern`       |
+| V4.0.3   | REST API                   | webapi.xml, REST Endpoints, API Authentication                            | `feature/v4.0.3-rest-api`                 |
 | V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
 | V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
 
@@ -128,7 +130,57 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 
 ## Version History
 
-### Version 3.0.4 (Current)
+### Version 4.0.1 (Current)
+**Branch:** `feature/v4.0.1-data-interfaces`  
+**Focus:** Data Interfaces & Service Contracts  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `Api/Data/BannerInterface` with all getter/setter method contracts
+- Created `Api/Data/BannerSearchResultsInterface` for repository pattern
+- Updated `Model/Banner` to implement `BannerInterface`
+- Refactored all model methods to use interface constants (BANNER_ID, TITLE, etc.)
+- Fixed return types to match interface specifications (nullable where appropriate)
+- Added DI preferences in `etc/di.xml` for interface binding
+- Updated module version to 4.0.1
+
+**Files Changed:**
+- `Api/Data/BannerInterface.php` - NEW: Data contract interface with all banner fields
+- `Api/Data/BannerSearchResultsInterface.php` - NEW: Search results interface
+- `Model/Banner.php` - Updated to implement BannerInterface, use constants, fixed return types
+- `etc/di.xml` - Added interface-to-implementation preferences
+- `etc/module.xml` - Updated version to 4.0.1
+
+**Key Concepts Demonstrated:**
+- **Service Contracts**: @api annotation for stable public interfaces
+- **Type Safety**: Strict type declarations on all methods
+- **Interface Constants**: Using constants instead of magic strings for data keys
+- **Nullable Types**: Proper use of `?int`, `?string`, `?bool` for optional fields
+- **DI Preferences**: Binding interfaces to concrete implementations
+- **Backward Compatibility**: All existing functionality preserved
+- **API Readiness**: Foundation for REST/SOAP API exposure (V4.0.3)
+- **Return Type Covariance**: Methods return BannerInterface instead of self
+
+**Usage Example:**
+```php
+// Before V4.0.1 (concrete class)
+public function __construct(Banner $banner) {}
+
+// After V4.0.1 (interface - preferred)
+public function __construct(BannerInterface $banner) {}
+```
+
+**Interface Compliance:**
+- All admin CRUD operations work identically to V3.0.4
+- No breaking changes to existing functionality
+- Models now satisfy service contract requirements
+- Ready for repository pattern implementation (V4.0.2)
+
+**Next Steps:** V4.0.2 will implement Repository Pattern and SearchCriteria for data abstraction.
+
+---
+
+### Version 3.0.4
 **Branch:** `feature/v3.0.4-pagebuilder-wysiwyg`  
 **Focus:** Page Builder and WYSIWYG Editor Integration  
 **Status:** ✅ Completed

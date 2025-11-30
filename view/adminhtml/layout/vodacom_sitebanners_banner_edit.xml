@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Vodacom. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="styles"/>
+    <!-- 
+        V3.0.4 CRITICAL: Added editor handle for Page Builder support
+        This handle loads all necessary JavaScript/CSS for WYSIWYG editors
+        including Page Builder modals, settings panels, and drag-drop functionality.
+        Without this, Page Builder settings popups won't open.
+    -->
+    <update handle="editor"/>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="vodacom_sitebanners_banner_form"/>
+        </referenceContainer>
+    </body>
+</page>

@@ -20,7 +20,12 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V1.0.3   | LESS Styling               | LESS Preprocessor, Variables, Mixins, Nesting, Luma Integration           | `feature/v1.0.3-less-styling`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
 | V2.0.1   | Schema Patches             | Schema Patches, Database Alterations, Migration Strategy                  | `feature/v2.0.1-schema-patches`           |
-| V3.0.0   | Admin UI                   | Admin Menu, ACL, UI Components (Grid & Form)                              | `feature/v3.0.0-admin-uicomponents`       |
+| V2.0.2   | Data Patches               | Data Patches, Database Seeding, Sample Data Installation                  | `feature/v2.0.2-data-patches`             |
+| V3.0.0   | Admin Menu & ACL           | Admin Menu, ACL Resources, Permission Hierarchy                           | `feature/v3.0.0-admin-menu-acl`           |
+| V3.0.1   | Grid UI Component          | Grid Configuration, Virtual Types, Data Providers, Actions Column         | `feature/v3.0.1-grid-ui`                  |
+| V3.0.2   | Form UI Component          | Form Configuration, DataProvider, Button Classes, Field Validation        | `feature/v3.0.2-form-ui`                  |
+| V3.0.3   | CRUD & Mass Actions        | Save/Delete Controllers, Mass Actions, Inline Editing                     | `feature/v3.0.3-crud-mass-actions`        |
+| V3.0.4   | PageBuilder/WYSIWYG        | WYSIWYG Editor, Page Builder Integration, Content Filtering              | `feature/v3.0.4-pagebuilder-wysiwyg`      |
 | V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
 | V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
 | V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
@@ -47,18 +52,258 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.0** (Current Branch: `feature/v3.0.0-admin-menu-acl`)
+**Version 3.0.4** (Current Branch: `feature/v3.0.4-pagebuilder-wysiwyg`) ✅ **Completed**
 
-This version demonstrates:
-- **Admin routing configuration** (`etc/adminhtml/routes.xml`)
-- **ACL (Access Control List)** resources with 3-level permission hierarchy (`etc/acl.xml`)
-- **Admin menu entry** under Content menu (`etc/adminhtml/menu.xml`)
-- **Admin controller** with authorization (`Controller/Adminhtml/Banner/Index.php`)
-- **ADMIN_RESOURCE constant** for permission checking
-- **Admin layout XML** (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
-- **Admin template** with placeholder content (`view/adminhtml/templates/banner/index.phtml`)
-- **Module dependencies** including Magento_Backend
-- Foundation for admin UI Components (Grid & Form to be added in V3.0.1-V3.0.3)
+This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
+
+### Admin Features (Page Builder)
+- **WYSIWYG Editor** with TinyMCE integration
+  - Rich text editing with formatting toolbar
+  - Drag-and-drop Page Builder interface
+  - Toggle between WYSIWYG and HTML code view
+  - 500px editor height for better content visibility
+- **Page Builder Components**:
+  - Rows, columns, tabs, buttons
+  - Image and video insertion
+  - Widget integration (product widgets, CMS blocks)
+  - Variable insertion ({{store url}}, {{media url}})
+  - Template directives processing
+- **Media Gallery Integration**:
+  - Browse and insert images from media library
+  - Upload new images directly from editor
+  - Automatic image path handling
+
+### Frontend Features (Content Rendering)
+- **Page Builder Content Processing**:
+  - CMS template filter for directive rendering
+  - Widget rendering ({{widget type="..."}})
+  - Media URL processing ({{media url="..."}})
+  - Dynamic content support
+- **Banner Display Logic**:
+  - Fetches all active banners from database
+  - Filters by is_active flag
+  - Filters by active_from/active_to date ranges
+  - Orders by sort_order ASC
+  - Empty state message when no active banners
+- **Date Range Display**:
+  - Shows active_from and active_to dates when set
+  - Formatted using IntlDateFormatter
+  - Helps users understand banner scheduling
+
+### Database Changes
+- **Schema Patch**: `ExpandContentFieldForPageBuilder.php`
+  - Expands content field from TEXT (64KB) to MEDIUMTEXT (16MB)
+  - Required for storing verbose Page Builder HTML
+  - Includes revert() method for rollback capability
+  - Depends on AddActiveDatesToBannerTable patch (V2.0.1)
+
+### Code Architecture
+- **Block Class**: `Block/Banner.php` (NEW in V3.0.4)
+  - `getActiveBanners()` - Fetches active banners with date filtering
+  - `filterContent()` - Processes Page Builder HTML through CMS filter
+  - `getBannerById()` - Retrieves specific banner by ID
+  - Uses CollectionFactory and FilterProvider
+- **Frontend Integration**:
+  - Layout updated with Block class reference
+  - Template updated to display dynamic content
+  - Page Builder content filtered before display
+
+### Module Dependencies
+- Added `Magento_PageBuilder` to module sequence
+- Enables Page Builder components in admin forms
+- Required for WYSIWYG editor functionality
+
+**Previous versions included:**
+- CRUD Operations and Mass Actions (V3.0.3)
+- Form UI Component (V3.0.2)
+- Grid UI Component (V3.0.1)
+- Admin Menu & ACL Foundation (V3.0.0)
+- Data Patches with 5 sample banners (V2.0.2)
+- Schema Patches for date columns (V2.0.1)
+- Declarative Schema with Models (V2.0.0)
+- LESS styling (V1.0.3)
+- Frontend routing and templates (V1.0.0-V1.0.2)
+
+---
+
+## Version History
+
+### Version 3.0.4 (Current)
+**Branch:** `feature/v3.0.4-pagebuilder-wysiwyg`  
+**Focus:** Page Builder and WYSIWYG Editor Integration  
+**Status:** ✅ Completed
+
+**What's New:**
+- Added Magento_PageBuilder module dependency
+- Created schema patch to expand content field to MEDIUMTEXT (16MB)
+- Changed content field from textarea to WYSIWYG editor in admin form
+- Enabled Page Builder drag-and-drop interface
+- Created frontend Block class for Page Builder content processing
+- Updated frontend template to display dynamic banner content
+- Implemented CMS template filter for directive/widget rendering
+- Added date range filtering in frontend display
+- Comprehensive code documentation for V3.0.4 changes
+
+**Files Changed:**
+- `etc/module.xml` - Updated version to 3.0.4, added Magento_PageBuilder dependency
+- `Setup/Patch/Schema/ExpandContentFieldForPageBuilder.php` - NEW: Schema patch for MEDIUMTEXT
+- `view/adminhtml/layout/vodacom_sitebanners_banner_edit.xml` - Added `<update handle="editor"/>` for Page Builder
+- `view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml` - Changed content field to WYSIWYG with Page Builder
+- `Block/Banner.php` - NEW: Frontend block for content processing
+- `view/frontend/layout/banners_index_view.xml` - Added Block class reference
+- `view/frontend/templates/view.phtml` - Updated to display dynamic content with filtering
+- `README.md` - Updated documentation with V3.0.4 details
+
+**Key Concepts Demonstrated:**
+- **WYSIWYG Integration**: formElement="wysiwyg" with template="ui/form/field"
+- **Page Builder JavaScript Loading**: `<update handle="editor"/>` in layout XML (CRITICAL)
+- **Element Template Configuration**: elementTmpl="ui/form/element/wysiwyg" for proper HTML IDs
+- **Schema Modification**: Using patches to alter existing database columns
+- **Content Filtering**: FilterProvider->getPageFilter() for directive processing
+- **Frontend Block Pattern**: Creating Block classes for business logic
+- **Dynamic Content Rendering**: Database-driven frontend content display
+- **Date-Based Filtering**: Complex collection queries with NULL handling
+- **Template Directives**: {{media url}}, {{widget type}}, {{store url}} processing
+- **Media Storage**: MEDIUMTEXT for large HTML content (Page Builder generates verbose HTML)
+- **Accessibility**: Proper label configuration to avoid console warnings
+
+**CRITICAL Page Builder Configuration:**
+
+**Layout XML** (Required for modals to work):
+```xml
+<!-- view/adminhtml/layout/vodacom_sitebanners_banner_edit.xml -->
+<page>
+    <update handle="styles"/>
+    <!-- CRITICAL: Loads Page Builder JavaScript/CSS -->
+    <update handle="editor"/>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="vodacom_sitebanners_banner_form"/>
+        </referenceContainer>
+    </body>
+</page>
+```
+
+**Form Field Configuration:**
+```xml
+<!-- view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml -->
+<field name="content" sortOrder="30" template="ui/form/field" formElement="wysiwyg">
+    <settings>
+        <additionalClasses>
+            <class name="admin__field-wide">true</class>
+        </additionalClasses>
+        <label translate="true">Content</label>
+        <dataScope>content</dataScope>
+        <elementTmpl>ui/form/element/wysiwyg</elementTmpl>
+    </settings>
+    <formElements>
+        <wysiwyg>
+            <settings>
+                <rows>8</rows>
+                <wysiwyg>true</wysiwyg>
+            </settings>
+        </wysiwyg>
+    </formElements>
+</field>
+```
+
+**Note**: Page Builder is enabled globally via Stores > Configuration > Content Management > Advanced Content Tools
+
+**Database Verification:**
+```bash
+# Check content field is MEDIUMTEXT
+docker exec -it hyva-tutorials-db-1 mariadb -u magento -pmagento magento \
+  -e "DESCRIBE vodacom_sitebanners_banner;"
+
+# Verify patch tracking
+docker exec -it hyva-tutorials-db-1 mariadb -u magento -pmagento magento \
+  -e "SELECT * FROM patch_list WHERE patch_name LIKE '%ExpandContent%';"
+```
+
+**Testing (V3.0.4):**
+1. ✅ Edit any banner in admin
+2. ✅ Verify WYSIWYG editor appears with Page Builder toolbar
+3. ✅ Test Page Builder drag-and-drop interface:
+   - Add Row > Add Column > Add Text
+   - Add Heading, Button, Image elements
+   - Configure element styles and layout
+4. ✅ Toggle between WYSIWYG and HTML code view
+5. ✅ Insert media from gallery
+6. ✅ Insert widget (e.g., CMS block widget)
+7. ✅ Save banner with rich content
+8. ✅ View frontend at `/banners/index/view`
+9. ✅ Verify Page Builder content renders correctly:
+   - Styling preserved
+   - Images display with correct URLs
+   - Widgets render properly
+   - Layout structure maintained
+10. ✅ Test date filtering (only shows banners within date range)
+11. ✅ Test empty state when no active banners
+
+**Frontend URL:**
+```
+http://your-magento-site.local/banners/index/view
+```
+
+**Next Steps (V4.0.0):**
+- Implement BannerRepositoryInterface (Repository pattern)
+- Create BannerInterface and BannerSearchResultsInterface
+- Expose REST API endpoints at `/V1/banners`
+- Add SearchCriteria support for flexible queries
+- Implement service contract architecture
+
+### Version 3.0.3
+**Branch:** `feature/v3.0.3-crud-mass-actions`  
+**Focus:** CRUD Operations and Mass Actions  
+**Status:** ✅ Completed
+
+This version demonstrates **CRUD Operations and Mass Actions**:
+
+### CRUD Controllers
+- **Save controller** (`Controller/Adminhtml/Banner/Save.php`)
+  - Handles both create and update operations
+  - Distinguishes between new and existing records via `banner_id` in POST data
+  - Uses DataPersistor for form state preservation on errors
+  - Redirects to grid or form (Save and Continue)
+  - Proper error handling and success messages
+- **Delete controller** (`Controller/Adminhtml/Banner/Delete.php`)
+  - Deletes single banner with validation
+  - Confirmation dialog via DeleteButton
+  - Error handling for non-existent records
+- **InlineEdit controller** (`Controller/Adminhtml/Banner/InlineEdit.php`)
+  - AJAX-based editing directly in grid
+  - JSON response format
+  - Handles multiple field updates simultaneously
+  - Validates banner existence before update
+
+### Mass Actions Controllers
+- **MassDelete** (`Controller/Adminhtml/Banner/MassDelete.php`)
+  - Deletes multiple selected banners
+  - Uses Magento\Ui\Component\MassAction\Filter
+  - Shows count of deleted records
+- **MassEnable** (`Controller/Adminhtml/Banner/MassEnable.php`)
+  - Sets `is_active=true` for selected banners
+  - Batch operation with success count
+- **MassDisable** (`Controller/Adminhtml/Banner/MassDisable.php`)
+  - Sets `is_active=false` for selected banners
+  - Batch operation with success count
+
+### Grid Enhancements
+- **Inline editing configuration** in grid XML
+  - Title column - text editor with required validation
+  - Active column - Yes/No dropdown
+  - Sort Order column - numeric input with validation
+  - Click any field to edit, press Enter to save
+- **Mass actions dropdown** in grid toolbar
+  - Delete with confirmation dialog
+  - Enable/Disable for bulk status changes
+  - Uses checkbox selection
+
+### Bug Fixes
+- Fixed DeleteButton parameter (`banner_id` → `id`)
+- Fixed Save controller to use POST `banner_id` instead of URL `id`
+- Fixed mass actions to pass boolean types (not integers) to `setIsActive()`
+- Proper handling of AUTO_INCREMENT for new records
 
 **Previous versions included:**
 - Frontend routing, controllers, layouts, templates (V1.0.0-V1.0.1)
@@ -66,6 +311,9 @@ This version demonstrates:
 - Declarative Schema with Models, Resource Models, Collections (V2.0.0)
 - Schema Patches for database alterations (V2.0.1)
 - Data Patches with 5 sample banners (V2.0.2)
+- Admin Menu, ACL Foundation (V3.0.0)
+- Grid UI Component (V3.0.1)
+- Form UI Component (V3.0.2)
 
 ### Accessing the Module
 
@@ -77,7 +325,7 @@ http://your-magento-site.local/banners/index/view
 
 **Admin Panel (V3.0.0+):**
 1. Log into Magento Admin
-2. Navigate to **Content > Site Banners**
+2. Navigate to **Vodacom > Site Banners** (custom top-level menu)
 3. You'll see a placeholder page confirming admin foundation is working
 4. In V3.0.1-V3.0.3, this will become a full CRUD interface with grid and forms
 
@@ -104,7 +352,7 @@ After switching branches, always clear cache and run setup:upgrade as configurat
 
 ---
 
-## Module Structure (V3.0.0)
+## Module Structure (V3.0.2)
 
 ```
 Vodacom/SiteBanners/
@@ -113,18 +361,37 @@ Vodacom/SiteBanners/
 │   │   └── View.php                          # Frontend controller action
 │   └── Adminhtml/
 │       └── Banner/
-│           └── Index.php                     # Admin controller (NEW in V3.0.0)
+│           ├── Index.php                     # Admin grid controller (V3.0.0)
+│           ├── Edit.php                      # Edit form controller (NEW in V3.0.2)
+│           └── NewAction.php                 # New banner controller (NEW in V3.0.2)
+├── Block/
+│   └── Adminhtml/
+│       └── Banner/
+│           └── Edit/
+│               ├── GenericButton.php         # Base class for buttons (NEW in V3.0.2)
+│               ├── BackButton.php            # Back button (NEW in V3.0.2)
+│               ├── DeleteButton.php          # Delete button (NEW in V3.0.2)
+│               ├── SaveButton.php            # Save button (NEW in V3.0.2)
+│               └── SaveAndContinueButton.php # Save & Continue button (NEW in V3.0.2)
+├── Ui/
+│   └── Component/
+│       └── Listing/
+│           └── Column/
+│               └── BannerActions.php         # Actions column for grid (V3.0.1)
 ├── etc/
-│   ├── module.xml                            # Module declaration (v3.0.0)
-│   ├── acl.xml                               # ACL permissions (NEW in V3.0.0)
+│   ├── module.xml                            # Module declaration (v3.0.2)
+│   ├── acl.xml                               # ACL permissions (V3.0.0)
 │   ├── db_schema.xml                         # Database schema
+│   ├── di.xml                                # Dependency injection (NEW in V3.0.1)
 │   ├── frontend/
 │   │   └── routes.xml                        # Frontend routing configuration
 │   └── adminhtml/
-│       ├── routes.xml                        # Admin routing (NEW in V3.0.0)
-│       └── menu.xml                          # Admin menu (NEW in V3.0.0)
+│       ├── routes.xml                        # Admin routing (V3.0.0)
+│       └── menu.xml                          # Admin menu (V3.0.0)
 ├── Model/
 │   ├── Banner.php                            # Banner Model with date scheduling
+│   ├── Banner/
+│   │   └── DataProvider.php                  # Form data provider (NEW in V3.0.2)
 │   └── ResourceModel/
 │       ├── Banner.php                        # Banner Resource Model
 │       └── Banner/
@@ -148,10 +415,14 @@ Vodacom/SiteBanners/
 │   │               └── _module.less          # LESS stylesheet
 │   └── adminhtml/
 │       ├── layout/
-│       │   └── vodacom_sitebanners_banner_index.xml  # Admin layout (NEW in V3.0.0)
-│       └── templates/
-│           └── banner/
-│               └── index.phtml               # Admin template (NEW in V3.0.0)
+│       │   ├── vodacom_sitebanners_banner_index.xml  # Grid layout (V3.0.0, updated V3.0.1)
+│       │   └── vodacom_sitebanners_banner_edit.xml   # Form layout (NEW in V3.0.2)
+│       ├── templates/
+│       │   └── banner/
+│       │       └── index.phtml               # Admin template (V3.0.0, replaced in V3.0.1)
+│       └── ui_component/
+│           ├── vodacom_sitebanners_banner_listing.xml  # Grid UI Component (V3.0.1)
+│           └── vodacom_sitebanners_banner_form.xml     # Form UI Component (NEW in V3.0.2)
 ├── composer.json                              # Composer package definition
 ├── registration.php                           # Module registration
 └── README.md                                  # This file
@@ -159,22 +430,24 @@ Vodacom/SiteBanners/
 
 ---
 
-## Learning Objectives (V3.0.0)
+## Learning Objectives (V3.0.2)
 
 By exploring this version, you will understand:
 
-1. **Admin Routing**: How to configure admin routes separate from frontend routes
-2. **ACL Resources**: Creating permission hierarchies for role-based access control
-3. **Admin Menu Configuration**: Adding menu items to existing admin sections (Content)
-4. **Controller Authorization**: Using ADMIN_RESOURCE constant for automatic permission checking
-5. **Admin Controllers**: Extending `Magento\Backend\App\Action` with authorization
-6. **Page Factory**: Creating admin result pages with titles and active menu
-7. **Admin Layout Handles**: Naming convention and structure for admin layouts
-8. **Module Dependencies**: Declaring dependencies on Magento core modules
-9. **Permission Enforcement**: How Magento checks ACL resources automatically
-10. **Admin Template Structure**: Basic admin page layout and messaging
+1. **Form UI Components**: XML-based form configuration
+2. **DataProvider Pattern**: Loading and preparing form data
+3. **Button Provider Interface**: Creating reusable form buttons
+4. **Generic Button Pattern**: Base class for button inheritance
+5. **Form Field Types**: Input, textarea, checkbox, date fields
+6. **Field Validation**: Required fields, numeric validation, date validation
+7. **Data Persistence**: Using DataPersistor for form state
+8. **Form Controllers**: Edit and NewAction patterns
+9. **Forward Result**: Forwarding requests between controllers
+10. **Form Layout Integration**: Connecting UI components to layouts
 
 **Previous Version Learning:**
+- Grid UI Components, Virtual Types (V3.0.1)
+- Admin Routing, ACL, Menu Configuration (V3.0.0)
 - Data/Schema Patches (V2.0.1-V2.0.2)
 - Models, Resource Models, Collections (V2.0.0)
 - LESS Styling (V1.0.3)
@@ -184,7 +457,132 @@ By exploring this version, you will understand:
 
 ## Version History
 
-### Version 3.0.0 (Current)
+### Version 3.0.2 (Current)
+**Branch:** `feature/v3.0.2-form-ui`  
+**Focus:** Form UI Component  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Form UI Component XML (`view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml`)
+- Implemented DataProvider class for form data (`Model/Banner/DataProvider.php`)
+- Created GenericButton base class for button reusability (`Block/Adminhtml/Banner/Edit/GenericButton.php`)
+- Implemented button classes:
+  - BackButton - Navigate back to grid
+  - DeleteButton - Delete banner with confirmation dialog
+  - SaveButton - Save banner
+  - SaveAndContinueButton - Save and continue editing
+- Created Edit controller for displaying form (`Controller/Adminhtml/Banner/Edit.php`)
+- Created NewAction controller for new banners (`Controller/Adminhtml/Banner/NewAction.php`)
+- Added form layout XML (`view/adminhtml/layout/vodacom_sitebanners_banner_edit.xml`)
+- Configured all form fields with proper validation
+- Updated module version to 3.0.2
+
+**Files Changed:**
+- `view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml` - NEW: Form UI Component
+- `Model/Banner/DataProvider.php` - NEW: Form data provider
+- `Block/Adminhtml/Banner/Edit/GenericButton.php` - NEW: Base button class
+- `Block/Adminhtml/Banner/Edit/BackButton.php` - NEW: Back button
+- `Block/Adminhtml/Banner/Edit/DeleteButton.php` - NEW: Delete button
+- `Block/Adminhtml/Banner/Edit/SaveButton.php` - NEW: Save button
+- `Block/Adminhtml/Banner/Edit/SaveAndContinueButton.php` - NEW: Save & Continue button
+- `Controller/Adminhtml/Banner/Edit.php` - NEW: Edit controller
+- `Controller/Adminhtml/Banner/NewAction.php` - NEW: New action controller
+- `view/adminhtml/layout/vodacom_sitebanners_banner_edit.xml` - NEW: Form layout
+- `etc/module.xml` - Updated version to 3.0.2
+- `README.md` - Updated documentation with V3.0.2 details
+
+**Key Concepts Demonstrated:**
+- **Form UI Components**: XML-based form configuration
+- **DataProvider Pattern**: Loading form data with DataPersistorInterface
+- **ButtonProviderInterface**: Creating form action buttons
+- **Generic Button Pattern**: Base class for button inheritance
+- **Form Field Configuration**: Input, textarea, checkbox, date fields
+- **Field Validation**: Required fields, numeric, and date validation
+- **Data Persistence**: Using DataPersistor for form state management
+- **Controller Patterns**: Edit action and forward pattern (NewAction)
+- **Form Buttons**: Back, Delete (with confirmation), Save, Save & Continue
+- **Layout Integration**: uiComponent in layout XML
+
+**Testing (V3.0.2 Completed Features):**
+1. ✅ Navigate to **Vodacom > Site Banners** in admin
+2. ✅ Click "Add New Banner" button - opens empty form
+3. ✅ Click "Edit" link on any banner - loads data into all 7 fields
+4. ✅ All form fields display correctly:
+   - banner_id (hidden)
+   - is_active (toggle switch, defaults to enabled)
+   - title (text input, required)
+   - content (textarea)
+   - sort_order (numeric input)
+   - active_from (date picker)
+   - active_to (date picker)
+5. ✅ Test Back button - returns to grid
+6. ✅ Delete button only shows when editing (not on new)
+7. ✅ All 4 buttons render correctly
+8. ✅ Field validation configured (title required, sort_order numeric, dates valid)
+9. ❌ Save/SaveAndContinue buttons present but will 404 (intentionally not implemented)
+10. ❌ Delete button shows but will 404 (intentionally not implemented)
+
+**Intentionally NOT Implemented in V3.0.2:**
+- Save Controller (V3.0.3)
+- Delete Controller (V3.0.3)
+- Mass Actions (V3.0.3)
+- Inline Edit (V3.0.3)
+
+**Next Steps (V3.0.3):**
+- Implement Save controller (create/update operations)
+- Implement Delete controller
+- Add mass actions (mass delete, mass enable/disable)
+- Add inline edit functionality in grid
+- Complete end-to-end CRUD workflow testing
+
+### Version 3.0.1
+**Branch:** `feature/v3.0.1-grid-ui`  
+**Focus:** Grid UI Component  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Grid UI Component XML (`view/adminhtml/ui_component/vodacom_sitebanners_banner_listing.xml`)
+- Configured data provider using virtual types in di.xml
+- Implemented grid collection with SearchResult interface
+- Created BannerActions column class for Edit/Delete links
+- Updated admin layout to use UI Component instead of template
+- Added all banner columns: ID, Title, Content, Active, Active From/To, Sort Order, Created
+- Implemented filters for all columns (text, date range, yes/no select)
+- Added sorting capability on all columns
+- Integrated with V2.0.2 sample data (displays 5 banners)
+- Added Magento_Ui module dependency
+- Updated module version to 3.0.1
+
+**Files Changed:**
+- `view/adminhtml/ui_component/vodacom_sitebanners_banner_listing.xml` - NEW: Grid UI Component
+- `etc/di.xml` - NEW: Data provider configuration with virtual types
+- `Ui/Component/Listing/Column/BannerActions.php` - NEW: Actions column class
+- `view/adminhtml/layout/vodacom_sitebanners_banner_index.xml` - Updated to use uiComponent
+- `etc/module.xml` - Updated version to 3.0.1, added Magento_Ui dependency
+- `README.md` - Updated documentation with V3.0.1 details
+
+**Key Concepts Demonstrated:**
+- **UI Components Architecture**: XML-based grid configuration
+- **Virtual Types**: Creating data providers without concrete classes
+- **Data Provider Pattern**: Connecting UI components to data sources
+- **Grid Collection**: Using SearchResult interface for grid data
+- **Column Components**: Different column types (text, date, select, actions)
+- **Filter Configuration**: Text, date range, and dropdown filters
+- **Actions Column**: Dynamic Edit/Delete links with confirmation dialogs
+- **Layout Integration**: Replacing template blocks with UI components
+
+**Testing:**
+1. Navigate to **Vodacom > Site Banners** in admin
+2. Should see grid with 5 sample banners from V2.0.2
+3. Test filters (Active, date ranges, search)
+4. Test sorting on all columns
+5. Verify Edit and Delete links appear (will 404 until V3.0.2/V3.0.3)
+
+**Next Steps:**
+- V3.0.2: Add Form UI Component for create/edit functionality
+- V3.0.3: Add CRUD controllers and mass actions
+
+### Version 3.0.0
 **Branch:** `feature/v3.0.0-admin-menu-acl`  
 **Focus:** Admin Menu & ACL Foundation  
 **Status:** ✅ Completed
@@ -195,7 +593,8 @@ By exploring this version, you will understand:
   - `Vodacom_SiteBanners::banners` - View banners (parent permission)
   - `Vodacom_SiteBanners::banner_save` - Save/edit banners
   - `Vodacom_SiteBanners::banner_delete` - Delete banners
-- Added admin menu entry under Content menu (`etc/adminhtml/menu.xml`)
+- Created custom "Vodacom" top-level admin menu section (`etc/adminhtml/menu.xml`)
+- Added "Site Banners" submenu under Vodacom section
 - Created Index controller with authorization (`Controller/Adminhtml/Banner/Index.php`)
 - Implemented ADMIN_RESOURCE constant for permission enforcement
 - Created admin layout XML (`view/adminhtml/layout/vodacom_sitebanners_banner_index.xml`)
@@ -225,8 +624,9 @@ By exploring this version, you will understand:
 
 **Testing Admin Access:**
 1. Log into Magento Admin Panel
-2. Navigate to **Content > Site Banners**
+2. Navigate to **Vodacom > Site Banners** (custom top-level menu)
 3. Should see placeholder page with V3.0.0 confirmation message
+4. Verify "Vodacom" appears as a top-level menu item in admin navigation
 4. Verify permission enforcement:
    - Admin user needs `Vodacom_SiteBanners::banners` permission
    - Check in System > Permissions > User Roles

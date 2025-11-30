@@ -1,32 +1,81 @@
 <?php
 /**
- * @var $block \Magento\Framework\View\Element\Template
+ * Frontend Template for Site Banners Display
+ * 
+ * V3.0.4 Changes:
+ * - Changed from static demo content to dynamic database-driven content
+ * - Added Page Builder content rendering via $block->filterContent()
+ * - Displays all active banners with date range filtering
+ * - Shows empty state message when no banners active
+ * 
+ * @var $block \Vodacom\SiteBanners\Block\Banner
  */
 ?>
 <div class="banner-page">
     <div class="banner-container">
         <header class="banner-header">
             <h1 class="banner-title"><?= __('Site Banners') ?></h1>
-            <p class="banner-subtitle"><?= __('Manage your promotional banners') ?></p>
+            <p class="banner-subtitle"><?= __('Active promotional banners with Page Builder content') ?></p>
         </header>
         
         <div class="banner-content">
-            <div class="banner-demo">
-                <h2 class="banner-demo-title"><?= __('Demo Banner') ?></h2>
-                <p class="banner-demo-text">
-                    <?= __('This is a demonstration of the Vodacom Site Banners module.') ?>
-                </p>
-                <p class="banner-demo-text">
-                    <?= __('Version 1.0.3 showcases LESS preprocessor with advanced styling features.') ?>
-                </p>
-                <p class="banner-demo-text">
-                    <?= __('LESS Features: Variables, Mixins, Nesting, Functions (lighten/darken), and Luma theme integration.') ?>
-                </p>
-            </div>
+            <?php 
+            // V3.0.4: Fetch active banners from database with date filtering
+            $banners = $block->getActiveBanners(); 
+            ?>
+            
+            <?php if ($banners->getSize() > 0): ?>
+                <?php foreach ($banners as $banner): ?>
+                    <div class="banner-item" data-banner-id="<?= $block->escapeHtmlAttr($banner->getId()) ?>">
+                        <div class="banner-item-header">
+                            <h2 class="banner-item-title"><?= $block->escapeHtml($banner->getTitle()) ?></h2>
+                        </div>
+                        
+                        <div class="banner-item-content">
+                            <?php 
+                            // V3.0.4: CRITICAL - Process Page Builder content through CMS filter
+                            // Without this filter, Page Builder HTML won't render correctly
+                            // This handles:
+                            // - {{media url="..."}} directives
+                            // - {{widget type="..."}} widgets
+                            // - Page Builder data-* attributes
+                            // - Dynamic content and conditional logic
+                            echo $block->filterContent($banner->getContent() ?? ''); 
+                            ?>
+                        </div>
+                        
+                        <?php if ($banner->getActiveFrom() || $banner->getActiveTo()): ?>
+                            <!-- V3.0.4: Display date range if configured (from V2.0.1 schema) -->
+                            <div class="banner-item-dates">
+                                <?php if ($banner->getActiveFrom()): ?>
+                                    <span class="banner-date-from">
+                                        <?= __('From: %1', $block->formatDate($banner->getActiveFrom(), \IntlDateFormatter::MEDIUM)) ?>
+                                    </span>
+                                <?php endif; ?>
+                                <?php if ($banner->getActiveTo()): ?>
+                                    <span class="banner-date-to">
+                                        <?= __('To: %1', $block->formatDate($banner->getActiveTo(), \IntlDateFormatter::MEDIUM)) ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <!-- V3.0.4: Empty state when no active banners found -->
+                <div class="banner-empty">
+                    <p class="banner-empty-message">
+                        <?= __('No active banners to display at this time.') ?>
+                    </p>
+                    <p class="banner-empty-help">
+                        <?= __('Create banners in the admin panel: Vodacom > Site Banners') ?>
+                    </p>
+                </div>
+            <?php endif; ?>
         </div>
         
         <footer class="banner-footer">
-            <p class="banner-info"><?= __('Vodacom SiteBanners Module - Version 1.0.3 (LESS Styling)') ?></p>
+            <p class="banner-info"><?= __('Vodacom SiteBanners Module - Version 3.0.4 (Page Builder/WYSIWYG)') ?></p>
         </footer>
     </div>
 </div>

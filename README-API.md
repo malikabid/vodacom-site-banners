@@ -3,9 +3,106 @@
 ## Overview
 The Site Banners module exposes a complete REST API for managing banners programmatically. All endpoints use the Repository Pattern implemented in V4.0.2.
 
-**Base URL:** `https://your-magento-store.com/rest`  
+**Base URL:** `https://your-magento-store.com/rest` or `http://your-magento-store.com/rest`  
 **API Version:** V1  
 **Authentication:** OAuth 1.0a or Token-based
+
+---
+
+## Quick Start - Postman Setup
+
+### Step 1: Create Integration Token in Magento Admin
+
+1. Login to Magento Admin
+2. Navigate to **System > Extensions > Integrations**
+3. Click **Add New Integration**
+4. Fill in details:
+   - **Name**: `Vodacom Banners API`
+   - **Email**: Your email
+   - **Your Password**: Enter your admin password
+5. Click **API** tab
+6. Set **Resource Access** to `Custom`
+7. Expand **Vodacom** > **Site Banners** and check:
+   - ☑️ **View Banners via API** (`Vodacom_SiteBanners::banner_view`)
+   - ☑️ **Save Banners via API** (`Vodacom_SiteBanners::banner_api_save`)
+   - ☑️ **Delete Banners via API** (`Vodacom_SiteBanners::banner_api_delete`)
+8. Click **Save**
+9. Click **Activate** button, then **Allow**
+10. **IMPORTANT**: Copy the **Access Token** (looks like: `abc123def456...`)
+
+### Step 2: Configure Postman
+
+**Option A: Use your actual domain (Recommended)**
+```
+Base URL: https://your-domain.test/rest
+OR
+Base URL: http://localhost/rest
+```
+
+**Option B: Find your Magento base URL**
+```bash
+# Run this command to find your base URL:
+bin/magento config:show web/unsecure/base_url
+bin/magento config:show web/secure/base_url
+```
+
+**Postman Request Setup:**
+
+1. **Create New Request**
+2. **Method**: GET
+3. **URL**: `http://YOUR_DOMAIN/rest/V1/vodacom/banners/1`
+   - Replace `YOUR_DOMAIN` with your actual domain (e.g., `hyva-tutorial.test`, `localhost`)
+4. **Headers** tab:
+   - Key: `Authorization` | Value: `Bearer YOUR_ACCESS_TOKEN`
+   - Key: `Content-Type` | Value: `application/json`
+5. Click **Send**
+
+### Step 3: Test Simple Request
+
+**Get Banner by ID:**
+```
+GET http://YOUR_DOMAIN/rest/V1/vodacom/banners/1
+Headers:
+  Authorization: Bearer YOUR_ACCESS_TOKEN
+  Content-Type: application/json
+```
+
+**Expected Success Response (200 OK):**
+```json
+{
+  "banner_id": 1,
+  "title": "Welcome Banner",
+  "content": "Welcome to our store!",
+  "is_active": 1,
+  "sort_order": 10,
+  "created_at": "2024-11-28 10:30:00",
+  "updated_at": "2024-11-28 10:30:00"
+}
+```
+
+### Common Issues & Solutions
+
+| Issue | Solution |
+|-------|----------|
+| **401 Unauthorized** | Check your Access Token is correct and starts with `Bearer ` |
+| **403 Forbidden** | Verify integration has the required permissions checked |
+| **404 Not Found** | Ensure URL is correct: `/rest/V1/vodacom/banners/1` (case-sensitive) |
+| **301 Redirect** | Your Magento redirects HTTP to HTTPS - use HTTPS in Postman |
+| **Connection refused** | Check Magento is running: `bin/magento cache:status` |
+| **Consumer isn't authorized** | Integration not activated - go to System > Integrations and click Activate |
+| **No such entity** | Banner ID doesn't exist - try ID 1, 2, 3, 4, or 5 (from sample data) |
+
+### Verify API is Working (Command Line Test)
+
+Run this from your terminal to test:
+```bash
+# Replace YOUR_DOMAIN and YOUR_TOKEN with your actual values
+curl -X GET "http://YOUR_DOMAIN/rest/V1/vodacom/banners/1" \
+  -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+If this works but Postman doesn't, the issue is with Postman configuration, not the API.
 
 ---
 

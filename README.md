@@ -47,22 +47,26 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.2** (Current Branch: `feature/v3.0.2-form-ui`)
+**Version 3.0.2** (Current Branch: `feature/v3.0.2-form-ui`) ✅ **Completed**
 
-This version demonstrates:
-- **Form UI Component** for creating and editing banners (`view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml`)
-- **DataProvider class** for loading form data (`Model/Banner/DataProvider.php`)
+This version demonstrates **Form UI Component structure**:
+- **Form UI Component XML** for creating and editing banners (`view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml`)
+- **DataProvider class** for loading form data with collection filtering (`Model/Banner/DataProvider.php`)
 - **Button classes** for form actions (`Block/Adminhtml/Banner/Edit/*.php`)
   - BackButton - Navigate back to grid
-  - DeleteButton - Delete banner with confirmation
-  - SaveButton - Save banner
-  - SaveAndContinueButton - Save and continue editing
+  - DeleteButton - Conditional display (only on edit) with confirmation dialog
+  - SaveButton - Form submission trigger
+  - SaveAndContinueButton - Save and stay on form
 - **Edit controller** to display form for existing banners (`Controller/Adminhtml/Banner/Edit.php`)
 - **NewAction controller** for creating new banners (`Controller/Adminhtml/Banner/NewAction.php`)
 - **Form fields** with validation (Title required, Sort Order numeric, Date validation)
-- **GenericButton base class** for button reusability
-- **Data persistence** using DataPersistor for form data
-- **Edit/Delete links** in grid now functional (navigate to form)
+- **GenericButton base class** for button reusability pattern
+- **Data persistence setup** using DataPersistor for form state
+- **Edit links** in grid navigate to form successfully
+- **"Add New Banner" button** in grid opens new banner form
+- **Parameter standardization** using `id` convention (not `banner_id`)
+
+**Note:** Save and Delete functionality intentionally deferred to V3.0.3 (CRUD Operations). This version focuses purely on Form UI Component structure and data loading.
 
 **Previous versions included:**
 - Frontend routing, controllers, layouts, templates (V1.0.0-V1.0.1)
@@ -259,20 +263,37 @@ By exploring this version, you will understand:
 - **Form Buttons**: Back, Delete (with confirmation), Save, Save & Continue
 - **Layout Integration**: uiComponent in layout XML
 
-**Testing:**
-1. Navigate to **Vodacom > Site Banners** in admin
-2. Click "Add New Banner" button - should open form
-3. Click "Edit" link on any banner - should load data into form
-4. Test field validation (title required, sort order numeric)
-5. Test Save button - should save and redirect to grid
-6. Test Save & Continue - should save and stay on form
-7. Test Back button - should return to grid
-8. Test Delete button - should show confirmation dialog
+**Testing (V3.0.2 Completed Features):**
+1. ✅ Navigate to **Vodacom > Site Banners** in admin
+2. ✅ Click "Add New Banner" button - opens empty form
+3. ✅ Click "Edit" link on any banner - loads data into all 7 fields
+4. ✅ All form fields display correctly:
+   - banner_id (hidden)
+   - is_active (toggle switch, defaults to enabled)
+   - title (text input, required)
+   - content (textarea)
+   - sort_order (numeric input)
+   - active_from (date picker)
+   - active_to (date picker)
+5. ✅ Test Back button - returns to grid
+6. ✅ Delete button only shows when editing (not on new)
+7. ✅ All 4 buttons render correctly
+8. ✅ Field validation configured (title required, sort_order numeric, dates valid)
+9. ❌ Save/SaveAndContinue buttons present but will 404 (intentionally not implemented)
+10. ❌ Delete button shows but will 404 (intentionally not implemented)
 
-**Next Steps:**
-- V3.0.3: Add Save controller and CRUD operations
-- V3.0.3: Add mass actions (mass delete, mass enable/disable)
-- V3.0.3: Add inline edit functionality
+**Intentionally NOT Implemented in V3.0.2:**
+- Save Controller (V3.0.3)
+- Delete Controller (V3.0.3)
+- Mass Actions (V3.0.3)
+- Inline Edit (V3.0.3)
+
+**Next Steps (V3.0.3):**
+- Implement Save controller (create/update operations)
+- Implement Delete controller
+- Add mass actions (mass delete, mass enable/disable)
+- Add inline edit functionality in grid
+- Complete end-to-end CRUD workflow testing
 
 ### Version 3.0.1
 **Branch:** `feature/v3.0.1-grid-ui`  

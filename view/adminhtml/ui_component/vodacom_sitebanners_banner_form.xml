@@ -12,6 +12,7 @@
             <item name="provider" xsi:type="string">vodacom_sitebanners_banner_form.banner_form_data_source</item>
         </item>
         <item name="label" xsi:type="string" translate="true">Banner Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
     
     <settings>
@@ -37,15 +38,16 @@
         <settings>
             <submitUrl path="vodacom_sitebanners/banner/save"/>
         </settings>
+        <aclResource>Vodacom_SiteBanners::banner_save</aclResource>
         <dataProvider class="Vodacom\SiteBanners\Model\Banner\DataProvider" name="banner_form_data_source">
             <settings>
-                <requestFieldName>banner_id</requestFieldName>
+                <requestFieldName>id</requestFieldName>
                 <primaryFieldName>banner_id</primaryFieldName>
             </settings>
         </dataProvider>
     </dataSource>
     
-    <fieldset name="general">
+    <fieldset name="banner_fieldset">
         <settings>
             <label translate="true">General Information</label>
         </settings>

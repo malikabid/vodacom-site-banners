@@ -43,7 +43,7 @@ class Edit extends Action
      */
     public function execute(): ResultInterface
     {
-        $bannerId = (int)$this->getRequest()->getParam('banner_id');
+        $bannerId = (int)$this->getRequest()->getParam('id');
         
         $resultPage = $this->resultPageFactory->create();
         $resultPage->setActiveMenu('Vodacom_SiteBanners::banners');

@@ -41,7 +41,7 @@ class GenericButton
      */
     public function getBannerId(): ?int
     {
-        $bannerId = $this->context->getRequest()->getParam('banner_id');
+        $bannerId = $this->context->getRequest()->getParam('id');
         return $bannerId ? (int)$bannerId : null;
     }
 

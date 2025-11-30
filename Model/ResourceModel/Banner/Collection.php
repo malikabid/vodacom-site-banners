@@ -52,7 +52,7 @@ class Collection extends AbstractCollection
      */
     public function addActiveFilter(bool $isActive = true): self
     {
-        $this->addFieldToFilter('is_active', $isActive ? 1 : 0);
+        $this->addFieldToFilter('is_active', ['eq' => $isActive ? 1 : 0]);
         return $this;
     }
 

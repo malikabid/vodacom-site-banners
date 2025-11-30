@@ -4,7 +4,10 @@ declare(strict_types=1);
 namespace Vodacom\SiteBanners\Model\Banner;
 
 use Magento\Framework\App\Request\DataPersistorInterface;
+use Magento\Framework\App\RequestInterface;
 use Magento\Ui\DataProvider\AbstractDataProvider;
+
+use Vodacom\SiteBanners\Model\BannerFactory;
 use Vodacom\SiteBanners\Model\ResourceModel\Banner\CollectionFactory;
 
 /**
@@ -19,9 +22,19 @@ class DataProvider extends AbstractDataProvider
     private DataPersistorInterface $dataPersistor;
 
     /**
-     * @var array
+     * @var mixed
      */
-    private array $loadedData = [];
+    protected $loadedData;
+
+    /**
+     * @var BannerFactory
+     */
+    private BannerFactory $bannerFactory;
+
+    /**
+     * @var RequestInterface
+     */
+    private RequestInterface $request;
 
     /**
      * @param string $name
@@ -29,6 +42,8 @@ class DataProvider extends AbstractDataProvider
      * @param string $requestFieldName
      * @param CollectionFactory $collectionFactory
      * @param DataPersistorInterface $dataPersistor
+     * @param BannerFactory $bannerFactory
+     * @param RequestInterface $request
      * @param array $meta
      * @param array $data
      */
@@ -38,11 +53,15 @@ class DataProvider extends AbstractDataProvider
         string $requestFieldName,
         CollectionFactory $collectionFactory,
         DataPersistorInterface $dataPersistor,
+        BannerFactory $bannerFactory,
+        RequestInterface $request,
         array $meta = [],
         array $data = []
     ) {
         $this->collection = $collectionFactory->create();
         $this->dataPersistor = $dataPersistor;
+        $this->bannerFactory = $bannerFactory;
+        $this->request = $request;
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
     }
 
@@ -51,22 +70,29 @@ class DataProvider extends AbstractDataProvider
      *
      * @return array
      */
-    public function getData(): array
+    public function getData()
     {
-        if (!empty($this->loadedData)) {
+        if (isset($this->loadedData)) {
             return $this->loadedData;
         }
 
-        $items = $this->collection->getItems();
-        foreach ($items as $banner) {
-            $this->loadedData[$banner->getId()] = $banner->getData();
+        $bannerId = $this->request->getParam('id');
+
+        if ($bannerId) {
+            // Filter collection by banner_id and load data
+            $this->collection->addFieldToFilter('banner_id', $bannerId);
+            $banner = $this->collection->getFirstItem();
+            
+            if ($banner->getId()) {
+                $this->loadedData[$banner->getId()] = $banner->getData();
+            }
         }
 
+        // Check for persisted data from DataPersistor (after validation failure)
         $data = $this->dataPersistor->get('vodacom_sitebanners_banner');
         if (!empty($data)) {
-            $banner = $this->collection->getNewEmptyItem();
-            $banner->setData($data);
-            $this->loadedData[$banner->getId()] = $banner->getData();
+            $bannerId = isset($data['banner_id']) ? $data['banner_id'] : null;
+            $this->loadedData[$bannerId] = $data;
             $this->dataPersistor->clear('vodacom_sitebanners_banner');
         }
 

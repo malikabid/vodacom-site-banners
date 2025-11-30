@@ -20,6 +20,13 @@
     </argument>
     
     <settings>
+        <buttons>
+            <button name="add">
+                <url path="*/*/new"/>
+                <class>primary</class>
+                <label translate="true">Add New Banner</label>
+            </button>
+        </buttons>
         <spinner>vodacom_sitebanners_banner_columns</spinner>
         <deps>
             <dep>vodacom_sitebanners_banner_listing.vodacom_sitebanners_banner_listing_data_source</dep>

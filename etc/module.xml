@@ -1,11 +1,21 @@
 <?xml version="1.0"?>
+<!--
+/**
+ * Vodacom SiteBanners Module Configuration
+ * 
+ * Version History:
+ * - V3.0.4: Added Magento_PageBuilder dependency for WYSIWYG/Page Builder support
+ */
+-->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Vodacom_SiteBanners" setup_version="3.0.3">
+    <module name="Vodacom_SiteBanners" setup_version="3.0.4">
         <sequence>
             <module name="Magento_Theme"/>
             <module name="Magento_Catalog"/>
             <module name="Magento_Backend"/>
             <module name="Magento_Ui"/>
+            <!-- V3.0.4: Added for Page Builder integration in admin form -->
+            <module name="Magento_PageBuilder"/>
         </sequence>
     </module>
 </config>

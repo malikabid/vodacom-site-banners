@@ -106,17 +106,65 @@
             </settings>
         </field>
         
-        <field name="content" sortOrder="30" formElement="textarea">
+        <!-- 
+        ====================================================================
+        V3.0.4: WYSIWYG Editor with Page Builder Integration
+        ====================================================================
+        Changed from: formElement="textarea" (V3.0.2 and earlier)
+        Changed to: formElement="wysiwyg" with Page Builder support
+        
+        Key Configuration Options:
+        - is_pagebuilder_enabled: true = Enables drag-drop Page Builder interface
+        - toggle_button: true = Allows switching between WYSIWYG and HTML code view
+        - height: 500px = Editor height for better content visibility
+        - add_variables: true = Enables {{store url="..."}} type variables
+        - add_widgets: true = Enables {{widget type="..."}} insertion
+        - add_images: true = Enables media gallery image insertion
+        - add_directives: true = Enables template directives processing
+        
+        Storage Requirement:
+        Page Builder generates verbose HTML requiring MEDIUMTEXT storage.
+        Schema patch ExpandContentFieldForPageBuilder.php expands content field to 16MB.
+        ====================================================================
+        -->
+        <field name="content" sortOrder="30" formElement="wysiwyg">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">banner</item>
+                    <!-- V3.0.4: Page Builder Configuration -->
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <!-- Enable Page Builder drag-drop interface -->
+                        <item name="is_pagebuilder_enabled" xsi:type="boolean">true</item>
+                        <!-- Show toggle between WYSIWYG and HTML code view -->
+                        <item name="toggle_button" xsi:type="boolean">true</item>
+                        <!-- Set editor height for better visibility -->
+                        <item name="height" xsi:type="string">500px</item>
+                        <!-- Enable variable insertion (e.g., {{store url="..."}}) -->
+                        <item name="add_variables" xsi:type="boolean">true</item>
+                        <!-- Enable widget insertion (e.g., {{widget type="..."}}) -->
+                        <item name="add_widgets" xsi:type="boolean">true</item>
+                        <!-- Enable image upload/insertion from media gallery -->
+                        <item name="add_images" xsi:type="boolean">true</item>
+                        <!-- Enable template directives processing -->
+                        <item name="add_directives" xsi:type="boolean">true</item>
+                    </item>
                 </item>
             </argument>
             <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
                 <dataType>text</dataType>
                 <label translate="true">Content</label>
                 <dataScope>content</dataScope>
             </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
         </field>
         
         <field name="sort_order" sortOrder="40" formElement="input">

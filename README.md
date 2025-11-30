@@ -20,7 +20,12 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V1.0.3   | LESS Styling               | LESS Preprocessor, Variables, Mixins, Nesting, Luma Integration           | `feature/v1.0.3-less-styling`             |
 | V2.0.0   | Database & Models          | Declarative Schema, Models, Resource Models, Collections                  | `feature/v2.0.0-db-models-schema`         |
 | V2.0.1   | Schema Patches             | Schema Patches, Database Alterations, Migration Strategy                  | `feature/v2.0.1-schema-patches`           |
-| V3.0.0   | Admin UI                   | Admin Menu, ACL, UI Components (Grid & Form)                              | `feature/v3.0.0-admin-uicomponents`       |
+| V2.0.2   | Data Patches               | Data Patches, Database Seeding, Sample Data Installation                  | `feature/v2.0.2-data-patches`             |
+| V3.0.0   | Admin Menu & ACL           | Admin Menu, ACL Resources, Permission Hierarchy                           | `feature/v3.0.0-admin-menu-acl`           |
+| V3.0.1   | Grid UI Component          | Grid Configuration, Virtual Types, Data Providers, Actions Column         | `feature/v3.0.1-grid-ui`                  |
+| V3.0.2   | Form UI Component          | Form Configuration, DataProvider, Button Classes, Field Validation        | `feature/v3.0.2-form-ui`                  |
+| V3.0.3   | CRUD & Mass Actions        | Save/Delete Controllers, Mass Actions, Inline Editing                     | `feature/v3.0.3-crud-mass-actions`        |
+| V3.0.4   | PageBuilder/WYSIWYG        | WYSIWYG Editor, Page Builder Integration, Content Filtering              | `feature/v3.0.4-pagebuilder-wysiwyg`      |
 | V4.0.0   | Service Contracts & API    | Repository/Data Interfaces, Web API (`webapi.xml`)                        | `feature/v4.0.0-service-contract-api`     |
 | V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
 | V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
@@ -47,7 +52,178 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.3** (Current Branch: `feature/v3.0.3-crud-mass-actions`) ✅ **Completed**
+**Version 3.0.4** (Current Branch: `feature/v3.0.4-pagebuilder-wysiwyg`) ✅ **Completed**
+
+This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
+
+### Admin Features (Page Builder)
+- **WYSIWYG Editor** with TinyMCE integration
+  - Rich text editing with formatting toolbar
+  - Drag-and-drop Page Builder interface
+  - Toggle between WYSIWYG and HTML code view
+  - 500px editor height for better content visibility
+- **Page Builder Components**:
+  - Rows, columns, tabs, buttons
+  - Image and video insertion
+  - Widget integration (product widgets, CMS blocks)
+  - Variable insertion ({{store url}}, {{media url}})
+  - Template directives processing
+- **Media Gallery Integration**:
+  - Browse and insert images from media library
+  - Upload new images directly from editor
+  - Automatic image path handling
+
+### Frontend Features (Content Rendering)
+- **Page Builder Content Processing**:
+  - CMS template filter for directive rendering
+  - Widget rendering ({{widget type="..."}})
+  - Media URL processing ({{media url="..."}})
+  - Dynamic content support
+- **Banner Display Logic**:
+  - Fetches all active banners from database
+  - Filters by is_active flag
+  - Filters by active_from/active_to date ranges
+  - Orders by sort_order ASC
+  - Empty state message when no active banners
+- **Date Range Display**:
+  - Shows active_from and active_to dates when set
+  - Formatted using IntlDateFormatter
+  - Helps users understand banner scheduling
+
+### Database Changes
+- **Schema Patch**: `ExpandContentFieldForPageBuilder.php`
+  - Expands content field from TEXT (64KB) to MEDIUMTEXT (16MB)
+  - Required for storing verbose Page Builder HTML
+  - Includes revert() method for rollback capability
+  - Depends on AddActiveDatesToBannerTable patch (V2.0.1)
+
+### Code Architecture
+- **Block Class**: `Block/Banner.php` (NEW in V3.0.4)
+  - `getActiveBanners()` - Fetches active banners with date filtering
+  - `filterContent()` - Processes Page Builder HTML through CMS filter
+  - `getBannerById()` - Retrieves specific banner by ID
+  - Uses CollectionFactory and FilterProvider
+- **Frontend Integration**:
+  - Layout updated with Block class reference
+  - Template updated to display dynamic content
+  - Page Builder content filtered before display
+
+### Module Dependencies
+- Added `Magento_PageBuilder` to module sequence
+- Enables Page Builder components in admin forms
+- Required for WYSIWYG editor functionality
+
+**Previous versions included:**
+- CRUD Operations and Mass Actions (V3.0.3)
+- Form UI Component (V3.0.2)
+- Grid UI Component (V3.0.1)
+- Admin Menu & ACL Foundation (V3.0.0)
+- Data Patches with 5 sample banners (V2.0.2)
+- Schema Patches for date columns (V2.0.1)
+- Declarative Schema with Models (V2.0.0)
+- LESS styling (V1.0.3)
+- Frontend routing and templates (V1.0.0-V1.0.2)
+
+---
+
+## Version History
+
+### Version 3.0.4 (Current)
+**Branch:** `feature/v3.0.4-pagebuilder-wysiwyg`  
+**Focus:** Page Builder and WYSIWYG Editor Integration  
+**Status:** ✅ Completed
+
+**What's New:**
+- Added Magento_PageBuilder module dependency
+- Created schema patch to expand content field to MEDIUMTEXT (16MB)
+- Changed content field from textarea to WYSIWYG editor in admin form
+- Enabled Page Builder drag-and-drop interface
+- Created frontend Block class for Page Builder content processing
+- Updated frontend template to display dynamic banner content
+- Implemented CMS template filter for directive/widget rendering
+- Added date range filtering in frontend display
+- Comprehensive code documentation for V3.0.4 changes
+
+**Files Changed:**
+- `etc/module.xml` - Updated version to 3.0.4, added Magento_PageBuilder dependency
+- `Setup/Patch/Schema/ExpandContentFieldForPageBuilder.php` - NEW: Schema patch for MEDIUMTEXT
+- `view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml` - Changed content field to WYSIWYG with Page Builder
+- `Block/Banner.php` - NEW: Frontend block for content processing
+- `view/frontend/layout/banners_index_view.xml` - Added Block class reference
+- `view/frontend/templates/view.phtml` - Updated to display dynamic content with filtering
+- `README.md` - Updated documentation with V3.0.4 details
+
+**Key Concepts Demonstrated:**
+- **WYSIWYG Integration**: formElement="wysiwyg" configuration in UI Component
+- **Page Builder Enablement**: is_pagebuilder_enabled configuration option
+- **Schema Modification**: Using patches to alter existing database columns
+- **Content Filtering**: FilterProvider->getPageFilter() for directive processing
+- **Frontend Block Pattern**: Creating Block classes for business logic
+- **Dynamic Content Rendering**: Database-driven frontend content display
+- **Date-Based Filtering**: Complex collection queries with NULL handling
+- **Template Directives**: {{media url}}, {{widget type}}, {{store url}} processing
+- **Media Storage**: MEDIUMTEXT for large HTML content (Page Builder generates verbose HTML)
+
+**Page Builder Configuration Options:**
+```xml
+<item name="wysiwygConfigData" xsi:type="array">
+    <item name="is_pagebuilder_enabled" xsi:type="boolean">true</item>
+    <item name="toggle_button" xsi:type="boolean">true</item>
+    <item name="height" xsi:type="string">500px</item>
+    <item name="add_variables" xsi:type="boolean">true</item>
+    <item name="add_widgets" xsi:type="boolean">true</item>
+    <item name="add_images" xsi:type="boolean">true</item>
+    <item name="add_directives" xsi:type="boolean">true</item>
+</item>
+```
+
+**Database Verification:**
+```bash
+# Check content field is MEDIUMTEXT
+docker exec -it hyva-tutorials-db-1 mariadb -u magento -pmagento magento \
+  -e "DESCRIBE vodacom_sitebanners_banner;"
+
+# Verify patch tracking
+docker exec -it hyva-tutorials-db-1 mariadb -u magento -pmagento magento \
+  -e "SELECT * FROM patch_list WHERE patch_name LIKE '%ExpandContent%';"
+```
+
+**Testing (V3.0.4):**
+1. ✅ Edit any banner in admin
+2. ✅ Verify WYSIWYG editor appears with Page Builder toolbar
+3. ✅ Test Page Builder drag-and-drop interface:
+   - Add Row > Add Column > Add Text
+   - Add Heading, Button, Image elements
+   - Configure element styles and layout
+4. ✅ Toggle between WYSIWYG and HTML code view
+5. ✅ Insert media from gallery
+6. ✅ Insert widget (e.g., CMS block widget)
+7. ✅ Save banner with rich content
+8. ✅ View frontend at `/banners/index/view`
+9. ✅ Verify Page Builder content renders correctly:
+   - Styling preserved
+   - Images display with correct URLs
+   - Widgets render properly
+   - Layout structure maintained
+10. ✅ Test date filtering (only shows banners within date range)
+11. ✅ Test empty state when no active banners
+
+**Frontend URL:**
+```
+http://your-magento-site.local/banners/index/view
+```
+
+**Next Steps (V4.0.0):**
+- Implement BannerRepositoryInterface (Repository pattern)
+- Create BannerInterface and BannerSearchResultsInterface
+- Expose REST API endpoints at `/V1/banners`
+- Add SearchCriteria support for flexible queries
+- Implement service contract architecture
+
+### Version 3.0.3
+**Branch:** `feature/v3.0.3-crud-mass-actions`  
+**Focus:** CRUD Operations and Mass Actions  
+**Status:** ✅ Completed
 
 This version demonstrates **CRUD Operations and Mass Actions**:
 

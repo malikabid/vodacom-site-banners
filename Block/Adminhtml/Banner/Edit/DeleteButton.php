@@ -42,6 +42,6 @@ class DeleteButton extends GenericButton implements ButtonProviderInterface
      */
     private function getDeleteUrl(): string
     {
-        return $this->getUrl('*/*/delete', ['banner_id' => $this->getBannerId()]);
+        return $this->getUrl('*/*/delete', ['id' => $this->getBannerId()]);
     }
 }

@@ -66,10 +66,66 @@
                 </settings>
             </filterSelect>
         </filters>
+        <!-- Mass Actions (V3.0.3) -->
+        <massaction name="listing_massaction" component="Magento_Ui/js/grid/tree-massactions">
+            <action name="delete">
+                <settings>
+                    <confirm>
+                        <message translate="true">Are you sure you want to delete the selected banner(s)?</message>
+                        <title translate="true">Delete Banners</title>
+                    </confirm>
+                    <url path="vodacom_sitebanners/banner/massDelete"/>
+                    <type>delete</type>
+                    <label translate="true">Delete</label>
+                </settings>
+            </action>
+            <action name="enable">
+                <settings>
+                    <url path="vodacom_sitebanners/banner/massEnable"/>
+                    <type>enable</type>
+                    <label translate="true">Enable</label>
+                </settings>
+            </action>
+            <action name="disable">
+                <settings>
+                    <url path="vodacom_sitebanners/banner/massDisable"/>
+                    <type>disable</type>
+                    <label translate="true">Disable</label>
+                </settings>
+            </action>
+        </massaction>
         <paging name="listing_paging"/>
     </listingToolbar>
     
     <columns name="vodacom_sitebanners_banner_columns">
+        <!-- Inline Editing Configuration (V3.0.3) -->
+        <settings>
+            <!-- Editor configuration for inline editing in grid -->
+            <editorConfig>
+                <param name="clientConfig" xsi:type="array">
+                    <!-- URL for saving inline edits via AJAX -->
+                    <item name="saveUrl" xsi:type="url" path="vodacom_sitebanners/banner/inlineEdit"/>
+                    <item name="validateBeforeSave" xsi:type="boolean">false</item>
+                </param>
+                <!-- Primary key field used for identifying records -->
+                <param name="indexField" xsi:type="string">banner_id</param>
+                <!-- Enable inline editing feature -->
+                <param name="enabled" xsi:type="boolean">true</param>
+                <param name="selectProvider" xsi:type="string">vodacom_sitebanners_banner_listing.vodacom_sitebanners_banner_listing.vodacom_sitebanners_banner_columns.ids</param>
+            </editorConfig>
+            <!-- Default behavior: click on cell to start editing -->
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">vodacom_sitebanners_banner_listing.vodacom_sitebanners_banner_listing.vodacom_sitebanners_banner_columns_editor</item>
+                    <item name="target" xsi:type="string">startEdit</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="string">${ $.$data.rowIndex }</item>
+                        <item name="1" xsi:type="boolean">true</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        
         <selectionsColumn name="ids">
             <settings>
                 <indexField>banner_id</indexField>
@@ -87,6 +143,13 @@
         <column name="title">
             <settings>
                 <filter>text</filter>
+                <!-- Inline editing: Text input with required validation -->
+                <editor>
+                    <validation>
+                        <rule name="required-entry" xsi:type="boolean">true</rule>
+                    </validation>
+                    <editorType>text</editorType>
+                </editor>
                 <label translate="true">Title</label>
             </settings>
         </column>
@@ -102,6 +165,10 @@
             <settings>
                 <options class="Magento\Config\Model\Config\Source\Yesno"/>
                 <filter>select</filter>
+                <!-- Inline editing: Yes/No dropdown -->
+                <editor>
+                    <editorType>select</editorType>
+                </editor>
                 <dataType>select</dataType>
                 <label translate="true">Active</label>
             </settings>
@@ -126,6 +193,13 @@
         <column name="sort_order">
             <settings>
                 <filter>textRange</filter>
+                <!-- Inline editing: Numeric input with number validation -->
+                <editor>
+                    <validation>
+                        <rule name="validate-number" xsi:type="boolean">true</rule>
+                    </validation>
+                    <editorType>text</editorType>
+                </editor>
                 <label translate="true">Sort Order</label>
             </settings>
         </column>

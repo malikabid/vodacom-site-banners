@@ -54,9 +54,59 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.4** (Current Branch: `feature/v3.0.4-pagebuilder-wysiwyg`) ✅ **Completed**
+**Version 4.0.3** (Current Branch: `feature/v4.0.3-rest-api`) ✅ **Completed**
 
-This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
+This version demonstrates **REST API Exposure**:
+
+### REST API Features
+- **Complete CRUD Operations via REST**:
+  - `GET /V1/vodacom/banners/:bannerId` - Retrieve single banner
+  - `GET /V1/vodacom/banners` - List banners with SearchCriteria
+  - `POST /V1/vodacom/banners` - Create new banner
+  - `PUT /V1/vodacom/banners/:bannerId` - Update existing banner
+  - `DELETE /V1/vodacom/banners/:bannerId` - Delete banner
+- **Authentication**:
+  - OAuth 1.0a support
+  - Token-based authentication via Integration tokens
+  - ACL-based permissions for fine-grained access control
+- **SearchCriteria Support**:
+  - Complex filtering (eq, neq, gt, lt, like, in, etc.)
+  - Pagination (currentPage, pageSize)
+  - Sorting (field, direction)
+  - Multiple filter groups
+- **API Documentation**:
+  - Comprehensive `README-API.md` with usage examples
+  - curl command examples for all endpoints
+  - Postman collection guidance
+  - Error handling documentation
+  - Security best practices
+
+### ACL Resources (Updated)
+- **API-Specific Permissions**:
+  - `Vodacom_SiteBanners::banner_view` - View banners via API
+  - `Vodacom_SiteBanners::banner_api_save` - Create/Update via API
+  - `Vodacom_SiteBanners::banner_api_delete` - Delete via API
+- **Separate from Admin Permissions**:
+  - API resources under `Magento_Backend::content_api`
+  - Admin resources under `Magento_Backend::content`
+  - Allows different permission sets for admin UI vs API
+
+### Configuration Files
+- **etc/webapi.xml**: Maps HTTP methods to repository operations
+- **etc/acl.xml**: Defines API resource hierarchy
+- **README-API.md**: Complete API documentation with examples
+
+### Key Benefits
+- **Leverages V4.0.2 Repository**: No new business logic needed
+- **Standard Magento REST**: Compatible with existing API clients
+- **Fully Documented**: Ready for integration with external systems
+- **Secure by Default**: ACL permissions enforced on all endpoints
+
+---
+
+## Previous Version Features
+
+**Version 3.0.4** - **Page Builder and WYSIWYG Editor Integration**:
 
 ### Admin Features (Page Builder)
 - **WYSIWYG Editor** with TinyMCE integration
@@ -130,7 +180,94 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 
 ## Version History
 
-### Version 4.0.2 (Current)
+### Version 4.0.3 (Current)
+**Branch:** `feature/v4.0.3-rest-api`  
+**Focus:** REST API Exposure  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `etc/webapi.xml` with REST endpoint mappings for all CRUD operations
+- Updated `etc/acl.xml` with API-specific resource permissions
+- Created comprehensive `README-API.md` with usage examples and curl commands
+- Updated module version to 4.0.3
+- Exposed repository via 5 REST endpoints:
+  - GET /V1/vodacom/banners/:bannerId - Retrieve single banner
+  - GET /V1/vodacom/banners - List with SearchCriteria support
+  - POST /V1/vodacom/banners - Create new banner
+  - PUT /V1/vodacom/banners/:bannerId - Update existing banner
+  - DELETE /V1/vodacom/banners/:bannerId - Delete banner
+
+**Files Created:**
+- `etc/webapi.xml` - REST API route configuration
+- `README-API.md` - Complete API documentation (450+ lines)
+
+**Files Modified:**
+- `etc/acl.xml` - Added API resource permissions (banner_view, banner_api_save, banner_api_delete)
+- `etc/module.xml` - Updated version to 4.0.3
+
+**Key Concepts Demonstrated:**
+- **REST API Configuration**: webapi.xml maps HTTP verbs to repository methods
+- **API Authentication**: OAuth 1.0a and token-based authentication
+- **ACL for APIs**: Separate permissions for API vs admin UI
+- **SearchCriteria via REST**: Complex queries through URL parameters
+- **Zero Business Logic**: Leverages existing repository from V4.0.2
+- **API Documentation**: Professional README-API.md with examples
+
+**API Endpoints:**
+```xml
+<!-- Get single banner -->
+<route url="/V1/vodacom/banners/:bannerId" method="GET">
+    <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="getById"/>
+    <resources><resource ref="Vodacom_SiteBanners::banner_view"/></resources>
+</route>
+
+<!-- List banners with SearchCriteria -->
+<route url="/V1/vodacom/banners" method="GET">
+    <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="getList"/>
+    <resources><resource ref="Vodacom_SiteBanners::banner_view"/></resources>
+</route>
+
+<!-- Create banner -->
+<route url="/V1/vodacom/banners" method="POST">
+    <service class="Vodacom\SiteBanners\Api\BannerRepositoryInterface" method="save"/>
+    <resources><resource ref="Vodacom_SiteBanners::banner_api_save"/></resources>
+</route>
+```
+
+**Usage Example:**
+```bash
+# Create integration in admin: System > Extensions > Integrations
+# Get access token and use in API calls
+
+# Get banner by ID
+curl -X GET "https://your-store.com/rest/V1/vodacom/banners/1" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json"
+
+# Create new banner
+curl -X POST "https://your-store.com/rest/V1/vodacom/banners" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"banner": {"title": "New Banner", "content": "Content here", "is_active": 1}}'
+
+# List active banners with SearchCriteria
+curl -X GET "https://your-store.com/rest/V1/vodacom/banners?searchCriteria[filterGroups][0][filters][0][field]=is_active&searchCriteria[filterGroups][0][filters][0][value]=1" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Benefits:**
+- **Zero Custom Code**: Pure configuration, leverages existing repository
+- **Standard Magento REST**: Compatible with existing API clients
+- **Complete Documentation**: README-API.md has 450+ lines of examples
+- **Secure**: ACL-based permissions enforced
+- **Ready for Integration**: External systems can manage banners programmatically
+- **SearchCriteria Support**: Complex filtering, sorting, pagination via URL params
+
+**Next Steps:** V5.0.0 will demonstrate Dependency Injection, Factories, and ViewModels
+
+---
+
+### Version 4.0.2
 **Branch:** `feature/v4.0.2-repository-pattern`  
 **Focus:** Repository Pattern & SearchCriteria  
 **Status:** ✅ Completed

@@ -20,6 +20,10 @@
     <preference for="Vodacom\SiteBanners\Api\Data\BannerSearchResultsInterface" 
                 type="Magento\Framework\Api\SearchResults"/>
     
+    <!-- V4.0.2: Bind repository interface to implementation -->
+    <preference for="Vodacom\SiteBanners\Api\BannerRepositoryInterface" 
+                type="Vodacom\SiteBanners\Model\BannerRepository"/>
+    
     <!-- Data Provider Type Configuration -->
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>

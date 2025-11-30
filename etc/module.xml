@@ -6,10 +6,11 @@
  * Version History:
  * - V3.0.4: Added Magento_PageBuilder dependency for WYSIWYG/Page Builder support
  * - V4.0.1: Added Data Interfaces and Service Contracts
+ * - V4.0.2: Implemented Repository Pattern and refactored controllers
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Vodacom_SiteBanners" setup_version="4.0.1">
+    <module name="Vodacom_SiteBanners" setup_version="4.0.2">
         <sequence>
             <module name="Magento_Theme"/>
             <module name="Magento_Catalog"/>

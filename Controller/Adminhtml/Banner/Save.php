@@ -8,11 +8,14 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Request\DataPersistorInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Vodacom\SiteBanners\Model\BannerFactory;
-use Vodacom\SiteBanners\Model\ResourceModel\Banner as BannerResource;
+use Vodacom\SiteBanners\Api\BannerRepositoryInterface;
+use Vodacom\SiteBanners\Api\Data\BannerInterface;
+use Vodacom\SiteBanners\Api\Data\BannerInterfaceFactory;
 
 /**
  * Save Banner Controller
+ * 
+ * V4.0.2: Refactored to use Repository Pattern instead of direct ResourceModel access
  */
 class Save extends Action
 {
@@ -27,31 +30,31 @@ class Save extends Action
     private DataPersistorInterface $dataPersistor;
 
     /**
-     * @var BannerFactory
+     * @var BannerInterfaceFactory
      */
-    private BannerFactory $bannerFactory;
+    private BannerInterfaceFactory $bannerFactory;
 
     /**
-     * @var BannerResource
+     * @var BannerRepositoryInterface
      */
-    private BannerResource $bannerResource;
+    private BannerRepositoryInterface $bannerRepository;
 
     /**
      * @param Context $context
      * @param DataPersistorInterface $dataPersistor
-     * @param BannerFactory $bannerFactory
-     * @param BannerResource $bannerResource
+     * @param BannerInterfaceFactory $bannerFactory
+     * @param BannerRepositoryInterface $bannerRepository
      */
     public function __construct(
         Context $context,
         DataPersistorInterface $dataPersistor,
-        BannerFactory $bannerFactory,
-        BannerResource $bannerResource
+        BannerInterfaceFactory $bannerFactory,
+        BannerRepositoryInterface $bannerRepository
     ) {
         parent::__construct($context);
         $this->dataPersistor = $dataPersistor;
         $this->bannerFactory = $bannerFactory;
-        $this->bannerResource = $bannerResource;
+        $this->bannerRepository = $bannerRepository;
     }
 
     /**
@@ -69,31 +72,27 @@ class Save extends Action
             $bannerId = !empty($data['banner_id']) ? (int)$data['banner_id'] : null;
             
             try {
-                $banner = $this->bannerFactory->create();
-                
+                /** @var BannerInterface $banner */
                 if ($bannerId) {
-                    // Load existing banner for update
-                    $this->bannerResource->load($banner, $bannerId);
-                    if (!$banner->getId()) {
-                        $this->messageManager->addErrorMessage(__('This banner no longer exists.'));
-                        return $resultRedirect->setPath('*/*/');
-                    }
-                    // For updates, we can keep banner_id in data since it matches the loaded banner
+                    // Load existing banner for update using repository
+                    $banner = $this->bannerRepository->getById($bannerId);
                 } else {
-                    // New banner - remove banner_id from data to let AUTO_INCREMENT work
+                    // Create new banner
+                    $banner = $this->bannerFactory->create();
+                    // Remove banner_id from data to let AUTO_INCREMENT work
                     unset($data['banner_id']);
                 }
 
-                // Set data and save
+                // Set data and save using repository
                 $banner->setData($data);
-                $this->bannerResource->save($banner);
+                $this->bannerRepository->save($banner);
 
                 $this->messageManager->addSuccessMessage(__('You saved the banner.'));
                 $this->dataPersistor->clear('vodacom_sitebanners_banner');
 
                 // Check if 'Save and Continue Edit' was clicked
                 if ($this->getRequest()->getParam('back')) {
-                    return $resultRedirect->setPath('*/*/edit', ['id' => $banner->getId()]);
+                    return $resultRedirect->setPath('*/*/edit', ['id' => $banner->getBannerId()]);
                 }
 
                 return $resultRedirect->setPath('*/*/');

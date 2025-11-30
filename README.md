@@ -47,26 +47,55 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 3.0.2** (Current Branch: `feature/v3.0.2-form-ui`) ✅ **Completed**
+**Version 3.0.3** (Current Branch: `feature/v3.0.3-crud-mass-actions`) ✅ **Completed**
 
-This version demonstrates **Form UI Component structure**:
-- **Form UI Component XML** for creating and editing banners (`view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml`)
-- **DataProvider class** for loading form data with collection filtering (`Model/Banner/DataProvider.php`)
-- **Button classes** for form actions (`Block/Adminhtml/Banner/Edit/*.php`)
-  - BackButton - Navigate back to grid
-  - DeleteButton - Conditional display (only on edit) with confirmation dialog
-  - SaveButton - Form submission trigger
-  - SaveAndContinueButton - Save and stay on form
-- **Edit controller** to display form for existing banners (`Controller/Adminhtml/Banner/Edit.php`)
-- **NewAction controller** for creating new banners (`Controller/Adminhtml/Banner/NewAction.php`)
-- **Form fields** with validation (Title required, Sort Order numeric, Date validation)
-- **GenericButton base class** for button reusability pattern
-- **Data persistence setup** using DataPersistor for form state
-- **Edit links** in grid navigate to form successfully
-- **"Add New Banner" button** in grid opens new banner form
-- **Parameter standardization** using `id` convention (not `banner_id`)
+This version demonstrates **CRUD Operations and Mass Actions**:
 
-**Note:** Save and Delete functionality intentionally deferred to V3.0.3 (CRUD Operations). This version focuses purely on Form UI Component structure and data loading.
+### CRUD Controllers
+- **Save controller** (`Controller/Adminhtml/Banner/Save.php`)
+  - Handles both create and update operations
+  - Distinguishes between new and existing records via `banner_id` in POST data
+  - Uses DataPersistor for form state preservation on errors
+  - Redirects to grid or form (Save and Continue)
+  - Proper error handling and success messages
+- **Delete controller** (`Controller/Adminhtml/Banner/Delete.php`)
+  - Deletes single banner with validation
+  - Confirmation dialog via DeleteButton
+  - Error handling for non-existent records
+- **InlineEdit controller** (`Controller/Adminhtml/Banner/InlineEdit.php`)
+  - AJAX-based editing directly in grid
+  - JSON response format
+  - Handles multiple field updates simultaneously
+  - Validates banner existence before update
+
+### Mass Actions Controllers
+- **MassDelete** (`Controller/Adminhtml/Banner/MassDelete.php`)
+  - Deletes multiple selected banners
+  - Uses Magento\Ui\Component\MassAction\Filter
+  - Shows count of deleted records
+- **MassEnable** (`Controller/Adminhtml/Banner/MassEnable.php`)
+  - Sets `is_active=true` for selected banners
+  - Batch operation with success count
+- **MassDisable** (`Controller/Adminhtml/Banner/MassDisable.php`)
+  - Sets `is_active=false` for selected banners
+  - Batch operation with success count
+
+### Grid Enhancements
+- **Inline editing configuration** in grid XML
+  - Title column - text editor with required validation
+  - Active column - Yes/No dropdown
+  - Sort Order column - numeric input with validation
+  - Click any field to edit, press Enter to save
+- **Mass actions dropdown** in grid toolbar
+  - Delete with confirmation dialog
+  - Enable/Disable for bulk status changes
+  - Uses checkbox selection
+
+### Bug Fixes
+- Fixed DeleteButton parameter (`banner_id` → `id`)
+- Fixed Save controller to use POST `banner_id` instead of URL `id`
+- Fixed mass actions to pass boolean types (not integers) to `setIsActive()`
+- Proper handling of AUTO_INCREMENT for new records
 
 **Previous versions included:**
 - Frontend routing, controllers, layouts, templates (V1.0.0-V1.0.1)
@@ -74,6 +103,9 @@ This version demonstrates **Form UI Component structure**:
 - Declarative Schema with Models, Resource Models, Collections (V2.0.0)
 - Schema Patches for database alterations (V2.0.1)
 - Data Patches with 5 sample banners (V2.0.2)
+- Admin Menu, ACL Foundation (V3.0.0)
+- Grid UI Component (V3.0.1)
+- Form UI Component (V3.0.2)
 
 ### Accessing the Module
 

@@ -147,6 +147,7 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 **Files Changed:**
 - `etc/module.xml` - Updated version to 3.0.4, added Magento_PageBuilder dependency
 - `Setup/Patch/Schema/ExpandContentFieldForPageBuilder.php` - NEW: Schema patch for MEDIUMTEXT
+- `view/adminhtml/layout/vodacom_sitebanners_banner_edit.xml` - Added `<update handle="editor"/>` for Page Builder
 - `view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml` - Changed content field to WYSIWYG with Page Builder
 - `Block/Banner.php` - NEW: Frontend block for content processing
 - `view/frontend/layout/banners_index_view.xml` - Added Block class reference
@@ -154,8 +155,9 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 - `README.md` - Updated documentation with V3.0.4 details
 
 **Key Concepts Demonstrated:**
-- **WYSIWYG Integration**: formElement="wysiwyg" configuration in UI Component
-- **Page Builder Enablement**: is_pagebuilder_enabled configuration option
+- **WYSIWYG Integration**: formElement="wysiwyg" with template="ui/form/field"
+- **Page Builder JavaScript Loading**: `<update handle="editor"/>` in layout XML (CRITICAL)
+- **Element Template Configuration**: elementTmpl="ui/form/element/wysiwyg" for proper HTML IDs
 - **Schema Modification**: Using patches to alter existing database columns
 - **Content Filtering**: FilterProvider->getPageFilter() for directive processing
 - **Frontend Block Pattern**: Creating Block classes for business logic
@@ -163,19 +165,49 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 - **Date-Based Filtering**: Complex collection queries with NULL handling
 - **Template Directives**: {{media url}}, {{widget type}}, {{store url}} processing
 - **Media Storage**: MEDIUMTEXT for large HTML content (Page Builder generates verbose HTML)
+- **Accessibility**: Proper label configuration to avoid console warnings
 
-**Page Builder Configuration Options:**
+**CRITICAL Page Builder Configuration:**
+
+**Layout XML** (Required for modals to work):
 ```xml
-<item name="wysiwygConfigData" xsi:type="array">
-    <item name="is_pagebuilder_enabled" xsi:type="boolean">true</item>
-    <item name="toggle_button" xsi:type="boolean">true</item>
-    <item name="height" xsi:type="string">500px</item>
-    <item name="add_variables" xsi:type="boolean">true</item>
-    <item name="add_widgets" xsi:type="boolean">true</item>
-    <item name="add_images" xsi:type="boolean">true</item>
-    <item name="add_directives" xsi:type="boolean">true</item>
-</item>
+<!-- view/adminhtml/layout/vodacom_sitebanners_banner_edit.xml -->
+<page>
+    <update handle="styles"/>
+    <!-- CRITICAL: Loads Page Builder JavaScript/CSS -->
+    <update handle="editor"/>
+    <body>
+        <referenceContainer name="content">
+            <uiComponent name="vodacom_sitebanners_banner_form"/>
+        </referenceContainer>
+    </body>
+</page>
 ```
+
+**Form Field Configuration:**
+```xml
+<!-- view/adminhtml/ui_component/vodacom_sitebanners_banner_form.xml -->
+<field name="content" sortOrder="30" template="ui/form/field" formElement="wysiwyg">
+    <settings>
+        <additionalClasses>
+            <class name="admin__field-wide">true</class>
+        </additionalClasses>
+        <label translate="true">Content</label>
+        <dataScope>content</dataScope>
+        <elementTmpl>ui/form/element/wysiwyg</elementTmpl>
+    </settings>
+    <formElements>
+        <wysiwyg>
+            <settings>
+                <rows>8</rows>
+                <wysiwyg>true</wysiwyg>
+            </settings>
+        </wysiwyg>
+    </formElements>
+</field>
+```
+
+**Note**: Page Builder is enabled globally via Stores > Configuration > Content Management > Advanced Content Tools
 
 **Database Verification:**
 ```bash

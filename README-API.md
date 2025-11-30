@@ -11,7 +11,17 @@ The Site Banners module exposes a complete REST API for managing banners program
 
 ## Quick Start - Postman Setup
 
-### Step 1: Create Integration Token in Magento Admin
+### Step 1: Enable Integration Tokens as Bearer Tokens
+
+**CRITICAL:** Run this command first to enable integration tokens:
+```bash
+bin/magento config:set oauth/consumer/enable_integration_as_bearer 1
+bin/magento cache:flush
+```
+
+Without this configuration, you'll get **401 Unauthorized** or **Consumer isn't authorized** errors.
+
+### Step 2: Create Integration Token in Magento Admin
 
 1. Login to Magento Admin
 2. Navigate to **System > Extensions > Integrations**
@@ -30,7 +40,7 @@ The Site Banners module exposes a complete REST API for managing banners program
 9. Click **Activate** button, then **Allow**
 10. **IMPORTANT**: Copy the **Access Token** (looks like: `abc123def456...`)
 
-### Step 2: Configure Postman
+### Step 3: Configure Postman
 
 **Option A: Use your actual domain (Recommended)**
 ```
@@ -57,7 +67,7 @@ bin/magento config:show web/secure/base_url
    - Key: `Content-Type` | Value: `application/json`
 5. Click **Send**
 
-### Step 3: Test Simple Request
+### Step 4: Test Simple Request
 
 **Get Banner by ID:**
 ```
@@ -85,11 +95,12 @@ Headers:
 | Issue | Solution |
 |-------|----------|
 | **401 Unauthorized** | Check your Access Token is correct and starts with `Bearer ` |
+| **Consumer isn't authorized** | **MOST COMMON:** Run `bin/magento config:set oauth/consumer/enable_integration_as_bearer 1` then `bin/magento cache:flush` |
 | **403 Forbidden** | Verify integration has the required permissions checked |
 | **404 Not Found** | Ensure URL is correct: `/rest/V1/vodacom/banners/1` (case-sensitive) |
 | **301 Redirect** | Your Magento redirects HTTP to HTTPS - use HTTPS in Postman |
 | **Connection refused** | Check Magento is running: `bin/magento cache:status` |
-| **Consumer isn't authorized** | Integration not activated - go to System > Integrations and click Activate |
+| **Integration not activated** | Go to System > Integrations and click Activate button |
 | **No such entity** | Banner ID doesn't exist - try ID 1, 2, 3, 4, or 5 (from sample data) |
 
 ### Verify API is Working (Command Line Test)
@@ -107,6 +118,14 @@ If this works but Postman doesn't, the issue is with Postman configuration, not 
 ---
 
 ## Authentication
+
+### Prerequisites
+
+**Enable bearer token authentication** (required):
+```bash
+bin/magento config:set oauth/consumer/enable_integration_as_bearer 1
+bin/magento cache:flush
+```
 
 ### Generate Integration Token
 

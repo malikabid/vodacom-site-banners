@@ -13,7 +13,12 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     
+    <!-- V4.0.1: Bind data interfaces to concrete implementations -->
+    <preference for="Vodacom\SiteBanners\Api\Data\BannerInterface" 
+                type="Vodacom\SiteBanners\Model\Banner"/>
     
+    <preference for="Vodacom\SiteBanners\Api\Data\BannerSearchResultsInterface" 
+                type="Magento\Framework\Api\SearchResults"/>
     
     <!-- Data Provider Type Configuration -->
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">

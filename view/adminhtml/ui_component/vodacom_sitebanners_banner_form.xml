@@ -5,22 +5,27 @@
  * See COPYING.txt for license details.
  */
 -->
-<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
     <argument name="data" xsi:type="array">
         <item name="js_config" xsi:type="array">
-            <item name="provider" xsi:type="string">vodacom_sitebanners_banner_form.banner_form_data_source</item>
+            <item name="provider" xsi:type="string">
+        vodacom_sitebanners_banner_form.banner_form_data_source</item>
         </item>
-        <item name="label" xsi:type="string" translate="true">Banner Information</item>
-        <item name="template" xsi:type="string">templates/form/collapsible</item>
+        <item
+            name="label" xsi:type="string" translate="true">Banner Information</item>
+        <item
+            name="template" xsi:type="string">templates/form/collapsible</item>
     </argument>
-    
+
     <settings>
         <buttons>
-            <button name="back" class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\BackButton"/>
-            <button name="delete" class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\DeleteButton"/>
-            <button name="save" class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\SaveButton"/>
-            <button name="save_and_continue" class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\SaveAndContinueButton"/>
+            <button name="back" class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\BackButton" />
+            <button name="delete"
+                class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\DeleteButton" />
+            <button name="save" class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\SaveButton" />
+            <button name="save_and_continue"
+                class="Vodacom\SiteBanners\Block\Adminhtml\Banner\Edit\SaveAndContinueButton" />
         </buttons>
         <namespace>vodacom_sitebanners_banner_form</namespace>
         <dataScope>data</dataScope>
@@ -28,7 +33,7 @@
             <dep>vodacom_sitebanners_banner_form.banner_form_data_source</dep>
         </deps>
     </settings>
-    
+
     <dataSource name="banner_form_data_source">
         <argument name="data" xsi:type="array">
             <item name="js_config" xsi:type="array">
@@ -36,22 +41,23 @@
             </item>
         </argument>
         <settings>
-            <submitUrl path="vodacom_sitebanners/banner/save"/>
+            <submitUrl path="vodacom_sitebanners/banner/save" />
         </settings>
         <aclResource>Vodacom_SiteBanners::banner_save</aclResource>
-        <dataProvider class="Vodacom\SiteBanners\Model\Banner\DataProvider" name="banner_form_data_source">
+        <dataProvider class="Vodacom\SiteBanners\Model\Banner\DataProvider"
+            name="banner_form_data_source">
             <settings>
                 <requestFieldName>id</requestFieldName>
                 <primaryFieldName>banner_id</primaryFieldName>
             </settings>
         </dataProvider>
     </dataSource>
-    
+
     <fieldset name="banner_fieldset">
         <settings>
             <label translate="true">General Information</label>
         </settings>
-        
+
         <field name="banner_id" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -64,12 +70,13 @@
                 <dataScope>banner_id</dataScope>
             </settings>
         </field>
-        
+
         <field name="is_active" sortOrder="10" formElement="checkbox">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">banner</item>
-                    <item name="default" xsi:type="number">1</item>
+                    <item name="default"
+                        xsi:type="number">1</item>
                 </item>
             </argument>
             <settings>
@@ -82,14 +89,15 @@
                     <settings>
                         <valueMap>
                             <map name="false" xsi:type="number">0</map>
-                            <map name="true" xsi:type="number">1</map>
+                            <map name="true"
+                                xsi:type="number">1</map>
                         </valueMap>
                         <prefer>toggle</prefer>
                     </settings>
                 </checkbox>
             </formElements>
         </field>
-        
+
         <field name="title" sortOrder="20" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -105,7 +113,7 @@
                 <dataScope>title</dataScope>
             </settings>
         </field>
-        
+
         <!-- 
         ====================================================================
         V3.0.4: WYSIWYG Editor with Page Builder Integration
@@ -113,14 +121,16 @@
         Changed from: formElement="textarea" (V3.0.2 and earlier)
         Changed to: formElement="wysiwyg" with Page Builder support
         
-        Key Configuration Options:
-        - is_pagebuilder_enabled: true = Enables drag-drop Page Builder interface
-        - toggle_button: true = Allows switching between WYSIWYG and HTML code view
-        - height: 500px = Editor height for better content visibility
-        - add_variables: true = Enables {{store url="..."}} type variables
-        - add_widgets: true = Enables {{widget type="..."}} insertion
-        - add_images: true = Enables media gallery image insertion
-        - add_directives: true = Enables template directives processing
+        CRITICAL CONFIGURATION:
+        1. template="ui/form/field" - Required for Page Builder modals to work
+        2. <update handle="editor"/> in layout XML - Loads Page Builder JS/CSS
+        3. admin__field-wide - Full-width editor like CMS pages/blocks
+        4. rows="8" - Default editor height before Page Builder activates
+        5. elementTmpl with proper ID - Resolves "for attribute" warning
+        
+        The elementTmpl="ui/form/element/wysiwyg" explicitly sets the template
+        that generates proper HTML IDs for the textarea, allowing the label's
+        "for" attribute to match correctly and resolve accessibility warnings.
         
         Storage Requirement:
         Page Builder generates verbose HTML requiring MEDIUMTEXT storage.
@@ -166,12 +176,13 @@
                 </wysiwyg>
             </formElements>
         </field>
-        
+
         <field name="sort_order" sortOrder="40" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">banner</item>
-                    <item name="default" xsi:type="number">0</item>
+                    <item name="default"
+                        xsi:type="number">0</item>
                 </item>
             </argument>
             <settings>
@@ -183,7 +194,7 @@
                 <dataScope>sort_order</dataScope>
             </settings>
         </field>
-        
+
         <field name="active_from" sortOrder="50" formElement="date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
@@ -199,7 +210,7 @@
                 <dataScope>active_from</dataScope>
             </settings>
         </field>
-        
+
         <field name="active_to" sortOrder="60" formElement="date">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">

@@ -130,7 +130,76 @@ This version demonstrates **Page Builder and WYSIWYG Editor Integration**:
 
 ## Version History
 
-### Version 4.0.1 (Current)
+### Version 4.0.2 (Current)
+**Branch:** `feature/v4.0.2-repository-pattern`  
+**Focus:** Repository Pattern & SearchCriteria  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `Api/BannerRepositoryInterface` with full CRUD + getList methods
+- Implemented `Model/BannerRepository` with SearchCriteria support
+- Added instance caching in repository for performance optimization
+- Refactored `Save` controller to use repository instead of ResourceModel
+- Refactored `Delete` controller to use repository's `deleteById()` method
+- Refactored `MassDelete` controller to use repository's `delete()` method
+- Updated `etc/di.xml` with repository preference binding
+- Updated module version to 4.0.2
+
+**Files Created:**
+- `Api/BannerRepositoryInterface.php` - Repository contract with save, getById, delete, deleteById, getList
+- `Model/BannerRepository.php` - Repository implementation with CollectionProcessor support
+
+**Files Modified:**
+- `Controller/Adminhtml/Banner/Save.php` - Use BannerRepositoryInterface instead of ResourceModel
+- `Controller/Adminhtml/Banner/Delete.php` - Use repository deleteById() method
+- `Controller/Adminhtml/Banner/MassDelete.php` - Use repository delete() method
+- `etc/di.xml` - Added BannerRepositoryInterface preference
+- `etc/module.xml` - Updated version to 4.0.2
+
+**Key Concepts Demonstrated:**
+- **Repository Pattern**: Complete data abstraction layer
+- **SearchCriteria Support**: Using CollectionProcessor for complex queries
+- **Instance Caching**: Repository caches loaded entities to prevent duplicate queries
+- **Exception Handling**: CouldNotSaveException, CouldNotDeleteException, NoSuchEntityException
+- **Service Layer Separation**: Controllers no longer know about database/ResourceModel
+- **Interface-Based Development**: All operations through BannerRepositoryInterface
+- **Dependency Injection**: Proper constructor injection of repository interface
+
+**Repository Methods:**
+```php
+public function save(BannerInterface $banner): BannerInterface;
+public function getById(int $bannerId): BannerInterface;
+public function getList(SearchCriteriaInterface $searchCriteria): BannerSearchResultsInterface;
+public function delete(BannerInterface $banner): bool;
+public function deleteById(int $bannerId): bool;
+```
+
+**Usage Example:**
+```php
+// Before V4.0.2 (direct ResourceModel)
+public function __construct(
+    BannerFactory $bannerFactory,
+    BannerResource $bannerResource
+) {}
+
+// After V4.0.2 (repository pattern)
+public function __construct(
+    BannerRepositoryInterface $bannerRepository
+) {}
+```
+
+**Benefits:**
+- Complete abstraction from database implementation
+- Easy to mock for unit tests
+- SearchCriteria enables complex filtering without SQL
+- Foundation for REST API (V4.0.3)
+- Follows Magento 2 best practices
+
+**Next Steps:** V4.0.3 will expose repository via REST API using webapi.xml
+
+---
+
+### Version 4.0.1
 **Branch:** `feature/v4.0.1-data-interfaces`  
 **Focus:** Data Interfaces & Service Contracts  
 **Status:** ✅ Completed

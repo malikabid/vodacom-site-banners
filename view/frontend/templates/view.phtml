@@ -2,72 +2,86 @@
 /**
  * Frontend Template for Site Banners Display
  * 
- * V5.0.1 Changes:
- * - getActiveBanners() now returns array instead of Collection
- * - Changed $banners->getSize() to count($banners)
- * - Business logic moved to Helper, Block is thin delegation layer
+ * Version History:
+ * V5.0.3: ViewModel Pattern - Template focuses on presentation only
+ *         - Business logic moved to BannerViewModel
+ *         - Template accesses data through $viewModel
+ *         - Separation of concerns: presentation (template) vs business logic (ViewModel)
+ *         - Improved testability and maintainability
  * 
- * V3.0.4 Changes:
- * - Changed from static demo content to dynamic database-driven content
- * - Added Page Builder content rendering via $block->filterContent()
- * - Displays all active banners with date range filtering
- * - Shows empty state message when no banners active
+ * V5.0.1: DI Fundamentals - Helper pattern introduced
+ * V3.0.4: Page Builder content rendering
  * 
- * @var $block \Vodacom\SiteBanners\Block\Banner
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \Vodacom\SiteBanners\ViewModel\BannerViewModel $viewModel
  */
+
+// Get ViewModel from block arguments (injected via layout XML)
+$viewModel = $block->getData('view_model');
+
+if (!$viewModel) {
+    return; // No ViewModel injected
+}
 ?>
+
 <div class="banner-page">
     <div class="banner-container">
         <header class="banner-header">
             <h1 class="banner-title"><?= __('Site Banners') ?></h1>
-            <p class="banner-subtitle"><?= __('Active promotional banners with Page Builder content') ?></p>
+            <p class="banner-subtitle">
+                <?= __('Active promotional banners with Page Builder content') ?>
+            </p>
+            <?php if ($viewModel->hasBanners()): ?>
+                <p class="banner-count">
+                    <?= __('Showing %1 active banner(s)', $viewModel->getActiveBannersCount()) ?>
+                </p>
+            <?php endif; ?>
         </header>
         
         <div class="banner-content">
-            <?php 
-            // V5.0.1: Now returns array from Helper instead of Collection
-            $banners = $block->getActiveBanners(); 
-            ?>
-            
-            <?php if (count($banners) > 0): ?>
-                <?php foreach ($banners as $banner): ?>
-                    <div class="banner-item" data-banner-id="<?= $block->escapeHtmlAttr($banner->getId()) ?>">
+            <?php if ($viewModel->hasBanners()): ?>
+                <?php foreach ($viewModel->getActiveBanners() as $banner): ?>
+                    <div class="<?= $block->escapeHtmlAttr($viewModel->getBannerCssClasses($banner)) ?>" 
+                         data-banner-id="<?= $block->escapeHtmlAttr($banner->getBannerId()) ?>">
+                        
                         <div class="banner-item-header">
-                            <h2 class="banner-item-title"><?= $block->escapeHtml($banner->getTitle()) ?></h2>
+                            <!-- Title with formatting from ViewModel -->
+                            <h2 class="banner-item-title">
+                                <?= $viewModel->getFormattedTitle($banner) ?>
+                            </h2>
                         </div>
                         
+                        <!-- Page Builder content (HTML safe from CMS filter) -->
                         <div class="banner-item-content">
-                            <?php 
-                            // V3.0.4: CRITICAL - Process Page Builder content through CMS filter
-                            // Without this filter, Page Builder HTML won't render correctly
-                            // This handles:
-                            // - {{media url="..."}} directives
-                            // - {{widget type="..."}} widgets
-                            // - Page Builder data-* attributes
-                            // - Dynamic content and conditional logic
-                            echo $block->filterContent($banner->getContent() ?? ''); 
-                            ?>
+                            <?= /* @noEscape */ $viewModel->getBannerContent($banner) ?>
                         </div>
                         
-                        <?php if ($banner->getActiveFrom() || $banner->getActiveTo()): ?>
-                            <!-- V3.0.4: Display date range if configured (from V2.0.1 schema) -->
+                        <?php if ($viewModel->hasDateRestrictions($banner)): ?>
+                            <!-- Display date range if configured -->
                             <div class="banner-item-dates">
                                 <?php if ($banner->getActiveFrom()): ?>
                                     <span class="banner-date-from">
-                                        <?= __('From: %1', $block->formatDate($banner->getActiveFrom(), \IntlDateFormatter::MEDIUM)) ?>
+                                        <?= __('From: %1', $block->escapeHtml($viewModel->formatDate($banner->getActiveFrom()))) ?>
                                     </span>
                                 <?php endif; ?>
                                 <?php if ($banner->getActiveTo()): ?>
                                     <span class="banner-date-to">
-                                        <?= __('To: %1', $block->formatDate($banner->getActiveTo(), \IntlDateFormatter::MEDIUM)) ?>
+                                        <?= __('To: %1', $block->escapeHtml($viewModel->formatDate($banner->getActiveTo()))) ?>
                                     </span>
                                 <?php endif; ?>
                             </div>
                         <?php endif; ?>
+                        
+                        <!-- Meta information -->
+                        <div class="banner-meta">
+                            <span class="banner-sort-order">
+                                <?= __('Sort Order: %1', $block->escapeHtml($banner->getSortOrder())) ?>
+                            </span>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- V3.0.4: Empty state when no active banners found -->
+                <!-- Empty state when no active banners found -->
                 <div class="banner-empty">
                     <p class="banner-empty-message">
                         <?= __('No active banners to display at this time.') ?>
@@ -80,7 +94,12 @@
         </div>
         
         <footer class="banner-footer">
-            <p class="banner-info"><?= __('Vodacom SiteBanners Module - Version 5.0.1 (Dependency Injection)') ?></p>
+            <p class="banner-info">
+                <?= __('Vodacom SiteBanners Module - Version 5.0.3 (ViewModel Pattern)') ?>
+            </p>
+            <p class="banner-stats">
+                <?= __('Total Banners: %1', $viewModel->getTotalBannersCount()) ?>
+            </p>
         </footer>
     </div>
 </div>

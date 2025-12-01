@@ -56,11 +56,142 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 5.0.1** (Current Branch: `feature/v5.0.1-di-fundamentals`) ✅ **Completed**
+**Version 5.0.3** (Current Branch: `feature/v5.0.3-viewmodel`) ✅ **Completed**
 
-This version demonstrates **Dependency Injection Fundamentals with Helper Pattern**:
+This version demonstrates **ViewModel Pattern - Separation of Presentation and Business Logic**:
 
-### Dependency Injection Features
+### ViewModel Architecture
+- **BannerViewModel implements ArgumentInterface**:
+  - Pure ViewModel without extending framework base classes
+  - Injected via layout XML `<argument>` tag
+  - Clean separation: Block = rendering, ViewModel = business logic
+  - Improved testability (no dependencies on Block/Context)
+- **Refactored Block to Generic Template**:
+  - Changed from custom `Vodacom\SiteBanners\Block\Banner` to generic `Magento\Framework\View\Element\Template`
+  - Block now only renders template, no business logic
+  - All data retrieval methods moved to ViewModel
+- **Template Updated to Use ViewModel**:
+  - Access ViewModel via `$block->getData('view_model')`
+  - All business logic calls go through ViewModel
+  - Clean template code focused on presentation
+
+### ViewModel Class Dependencies (Constructor Injection)
+1. **BannerRepositoryInterface** - Data access via repository pattern (V4.0.2)
+2. **BannerHelper** - Leverages existing business logic from V5.0.1
+3. **UrlInterface** - URL generation for banner actions
+4. **Escaper** - Safe HTML output
+5. **LoggerInterface** - Error handling and debugging
+6. **FilterProvider** - CMS template filter for Page Builder content (widgets, media URLs, directives)
+
+### ViewModel Public Methods (15+ methods)
+- **Data Retrieval**:
+  - `getActiveBanners()` - Returns array of BannerInterface with caching
+  - `getBanner($id)` - Fetch specific banner by ID
+  - `hasBanners()` - Boolean check for banner existence
+- **Formatting & Display**:
+  - `getFormattedTitle($banner)` - Escaped title with ucfirst
+  - `getBannerContent($banner)` - Page Builder content (HTML safe)
+  - `getBannerExcerpt($banner, $length)` - Truncated plain text
+  - `formatDate($date, $format)` - Date formatting with error handling
+- **Business Logic**:
+  - `isBannerActive($banner)` - Checks is_active flag AND date range
+  - `hasDateRestrictions($banner)` - Check if date-limited
+  - `getBannerCssClasses($banner)` - Dynamic CSS classes based on status
+- **Statistics & Counts**:
+  - `getBannerStatistics()` - Delegates to Helper (total, active, inactive)
+  - `getTotalBannersCount()` - Total banner count
+  - `getActiveBannersCount()` - Count of active banners
+- **Utility Methods**:
+  - `getBannerEditUrl($banner)` - Admin edit link generation
+
+### Files Changed in V5.0.3
+1. **ViewModel/BannerViewModel.php** (NEW - 330+ lines):
+   - Implements ArgumentInterface (ViewModel requirement)
+   - 15+ public methods for business logic
+   - Instance caching for performance
+   - Comprehensive error handling with logger
+   - FilterProvider integration for Page Builder content filtering
+
+2. **view/frontend/layout/banners_index_view.xml** (UPDATED):
+   - Changed Block class: `Vodacom\SiteBanners\Block\Banner` → `Magento\Framework\View\Element\Template`
+   - Added `<argument>` tag to inject BannerViewModel
+   - ViewModel injected as object type
+
+3. **view/frontend/templates/view.phtml** (UPDATED):
+   - Changed from `$block->method()` to `$viewModel->method()` pattern
+   - Uses `$block->escapeHtml()` and `$block->escapeHtmlAttr()` directly (no separate $escaper)
+   - Cleaner template focusing on presentation
+   - Uses `$block->getData('view_model')` to access ViewModel
+
+4. **etc/module.xml** (UPDATED):
+   - Version bumped from 5.0.2 to 5.0.3
+   - Added version history comment
+
+5. **README.md** (UPDATED):
+   - Added V5.0.3 feature documentation
+   - Updated version history and current version marker
+
+### Key Architectural Patterns
+- **ArgumentInterface** - Required interface for ViewModels in layout XML
+- **Dependency Injection via Layout** - ViewModel injected through XML, not constructor
+- **Separation of Concerns** - Clear boundary between presentation (template) and logic (ViewModel)
+- **Testability** - ViewModels easier to unit test than Blocks
+- **Composition over Inheritance** - ViewModel doesn't extend any framework class
+- **Performance** - Instance caching prevents redundant queries
+
+### Why ViewModel vs Block?
+- **Blocks**: Tied to layout system, harder to test, mixed responsibilities
+- **ViewModels**: Pure PHP classes, easy to test, single responsibility
+- **When to use ViewModel**:
+  - Complex business logic needed in templates
+  - Reusable logic across multiple templates
+  - Need better testability
+  - Want clean separation of concerns
+
+---
+
+## Previous Version Features
+
+**Version 5.0.2** - **Factory and Proxy Patterns**:
+
+### Factory Pattern Features
+- **BannerService with Factory Usage**:
+  - `Service/BannerService.php` - Business logic layer using Factories
+  - Creates Banner instances using `BannerInterfaceFactory` (auto-generated)
+  - Uses `CollectionFactory` for batch operations
+  - Demonstrates Factory pattern for object creation
+- **Console Command Demonstration**:
+  - `Console/Command/DemonstratePatterns.php` - Tests Factory and Proxy patterns
+  - Shows BannerInterfaceFactory vs CollectionFactory usage
+  - Demonstrates lazy loading with Proxy
+  - Benchmarks Factory performance
+
+### Proxy Pattern Features
+- **HeavyBannerProcessor with Proxy**:
+  - `Helper/HeavyBannerProcessor.php` - Simulates expensive operations
+  - Injected as Proxy in di.xml configuration
+  - Only instantiates when method is called (lazy loading)
+  - Prevents unnecessary resource consumption
+- **BannerStats Block with Proxy Injection**:
+  - `Block/BannerStats.php` - Demonstrates Proxy usage
+  - HeavyBannerProcessor injected as Proxy
+  - Processor only loads if statistics are requested
+  - Shows performance benefits of lazy loading
+
+### Key Factory & Proxy Concepts
+- **Auto-Generated Factories**:
+  - Magento creates `*Factory` classes automatically
+  - Usage: `$this->bannerFactory->create()` or `$this->bannerFactory->create(['data' => []])`
+  - No need to create Factory PHP files manually
+- **Proxy Configuration in di.xml**:
+  - Add `/Proxy` suffix to class name in di.xml
+  - Magento generates Proxy class at runtime
+  - Proxy intercepts first method call and instantiates real object
+- **When to Use**:
+  - **Factory**: Creating new instances (models, collections, data objects)
+  - **Proxy**: Injecting expensive classes that may not be used
+
+**Version 5.0.1** - **Dependency Injection Fundamentals**:
 - **Helper Class with Constructor Injection**:
   - `Helper/BannerHelper.php` - Business logic encapsulation
   - Injects 5 dependencies via constructor (proper DI pattern)

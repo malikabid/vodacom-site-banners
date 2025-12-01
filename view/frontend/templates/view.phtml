@@ -2,6 +2,11 @@
 /**
  * Frontend Template for Site Banners Display
  * 
+ * V5.0.1 Changes:
+ * - getActiveBanners() now returns array instead of Collection
+ * - Changed $banners->getSize() to count($banners)
+ * - Business logic moved to Helper, Block is thin delegation layer
+ * 
  * V3.0.4 Changes:
  * - Changed from static demo content to dynamic database-driven content
  * - Added Page Builder content rendering via $block->filterContent()
@@ -20,11 +25,11 @@
         
         <div class="banner-content">
             <?php 
-            // V3.0.4: Fetch active banners from database with date filtering
+            // V5.0.1: Now returns array from Helper instead of Collection
             $banners = $block->getActiveBanners(); 
             ?>
             
-            <?php if ($banners->getSize() > 0): ?>
+            <?php if (count($banners) > 0): ?>
                 <?php foreach ($banners as $banner): ?>
                     <div class="banner-item" data-banner-id="<?= $block->escapeHtmlAttr($banner->getId()) ?>">
                         <div class="banner-item-header">
@@ -75,7 +80,7 @@
         </div>
         
         <footer class="banner-footer">
-            <p class="banner-info"><?= __('Vodacom SiteBanners Module - Version 3.0.4 (Page Builder/WYSIWYG)') ?></p>
+            <p class="banner-info"><?= __('Vodacom SiteBanners Module - Version 5.0.1 (Dependency Injection)') ?></p>
         </footer>
     </div>
 </div>

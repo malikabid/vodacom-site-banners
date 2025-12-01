@@ -29,7 +29,9 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V4.0.1   | Data Interfaces            | BannerInterface, Service Contracts, Type Safety, DI Preferences           | `feature/v4.0.1-data-interfaces`          |
 | V4.0.2   | Repository Pattern         | Repository, SearchCriteria, Data Abstraction Layer                        | `feature/v4.0.2-repository-pattern`       |
 | V4.0.3   | REST API                   | webapi.xml, REST Endpoints, API Authentication                            | `feature/v4.0.3-rest-api`                 |
-| V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
+| V5.0.1   | DI Fundamentals            | Constructor Injection, Helper Pattern, Interface Injection                | `feature/v5.0.1-di-fundamentals`          |
+| V5.0.2   | Factories & Proxies        | Factory Pattern, Proxy Pattern, Lazy Loading                              | `feature/v5.0.2-factories-proxies`        |
+| V5.0.3   | ViewModel Pattern          | ArgumentInterface, Layout Injection, Template Logic Separation            | `feature/v5.0.3-viewmodel`                |
 | V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
 
 ---
@@ -54,9 +56,63 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 4.0.3** (Current Branch: `feature/v4.0.3-rest-api`) ✅ **Completed**
+**Version 5.0.1** (Current Branch: `feature/v5.0.1-di-fundamentals`) ✅ **Completed**
 
-This version demonstrates **REST API Exposure**:
+This version demonstrates **Dependency Injection Fundamentals with Helper Pattern**:
+
+### Dependency Injection Features
+- **Helper Class with Constructor Injection**:
+  - `Helper/BannerHelper.php` - Business logic encapsulation
+  - Injects 5 dependencies via constructor (proper DI pattern)
+  - Uses interface injection (BannerRepositoryInterface, not concrete class)
+  - Demonstrates type declarations on all constructor parameters
+- **Block Refactoring**:
+  - Changed from CollectionFactory to BannerHelper injection
+  - Block becomes thin delegation layer (separation of concerns)
+  - All business logic moved to Helper
+  - Maintains backwards compatibility (same public methods)
+- **Type Safety**:
+  - Strict type declarations on all methods
+  - Interface injection for loose coupling
+  - Returns array of BannerInterface (not Collection)
+- **SearchCriteria Builder Pattern**:
+  - FilterBuilder for is_active and date filtering
+  - SortOrderBuilder for proper ordering
+  - Demonstrates SearchCriteria construction
+
+### Helper Class Dependencies (Constructor Injection)
+1. **Context** - Base helper functionality
+2. **BannerRepositoryInterface** - Interface injection (not BannerRepository concrete class)
+3. **SearchCriteriaBuilder** - Build complex search queries
+4. **FilterBuilder** - Create filter conditions
+5. **SortOrderBuilder** - Create sort order objects
+6. **DateTime** - Current date/time for date filtering
+
+### Refactored Block Class
+- **Removed**: CollectionFactory dependency
+- **Added**: BannerHelper dependency
+- **Methods Changed**:
+  - `getActiveBanners()` - Returns `array` instead of `Collection`
+  - Delegates to Helper for business logic
+  - Template updated: `$banners->getSize()` → `count($banners)`
+
+### Fixed Issues
+- **BannerSearchResults Class**: Created proper implementation of BannerSearchResultsInterface
+- **di.xml Updated**: Changed preference from generic SearchResults to BannerSearchResults
+- **Template Compatibility**: Updated view.phtml to work with array instead of Collection
+
+### Key Architectural Patterns
+- **Constructor Injection** over property injection or ObjectManager
+- **Interface Injection** over concrete class injection
+- **Separation of Concerns**: Business logic in Helper, presentation in Block
+- **Type Safety**: Strict types throughout
+- **Delegation Pattern**: Block delegates to Helper
+
+---
+
+## Previous Version Features
+
+**Version 4.0.3** - **REST API Exposure**:
 
 ### REST API Features
 - **Complete CRUD Operations via REST**:
@@ -180,7 +236,47 @@ This version demonstrates **REST API Exposure**:
 
 ## Version History
 
-### Version 4.0.3 (Current)
+### Version 5.0.1 (Current)
+**Branch:** `feature/v5.0.1-di-fundamentals`  
+**Focus:** Dependency Injection Fundamentals with Helper Pattern  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `Helper/BannerHelper.php` with 5 constructor-injected dependencies
+- Refactored `Block/Banner.php` to use Helper instead of CollectionFactory
+- Moved business logic from Block to Helper (separation of concerns)
+- Updated `Model/BannerSearchResults.php` - proper implementation of SearchResultsInterface
+- Fixed `etc/di.xml` - changed SearchResults preference to BannerSearchResults
+- Updated `view/frontend/templates/view.phtml` - array compatibility (count vs getSize)
+- Module version updated to 5.0.1
+
+**Files Created:**
+- `Helper/BannerHelper.php` - Business logic with proper DI pattern
+- `Model/BannerSearchResults.php` - Type-safe SearchResults implementation
+
+**Files Modified:**
+- `Block/Banner.php` - Refactored to delegate to Helper
+- `etc/module.xml` - Version updated to 5.0.1
+- `etc/di.xml` - Fixed BannerSearchResultsInterface preference
+- `view/frontend/templates/view.phtml` - Array compatibility updates
+
+**Key Concepts Demonstrated:**
+- Constructor injection with type declarations
+- Interface injection (BannerRepositoryInterface) for loose coupling
+- Helper pattern for business logic encapsulation
+- SearchCriteria builder pattern (FilterBuilder, SortOrderBuilder)
+- Block as thin delegation layer
+- Strict type safety throughout
+- Proper DI container usage (no ObjectManager)
+
+**Breaking Changes:**
+- `Block::getActiveBanners()` now returns `array` instead of `Collection`
+- Template updated to use `count($banners)` instead of `$banners->getSize()`
+- No breaking changes for external API consumers
+
+---
+
+### Version 4.0.3
 **Branch:** `feature/v4.0.3-rest-api`  
 **Focus:** REST API Exposure  
 **Status:** ✅ Completed

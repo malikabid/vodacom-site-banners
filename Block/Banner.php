@@ -5,27 +5,28 @@ namespace Vodacom\SiteBanners\Block;
 
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
-use Vodacom\SiteBanners\Model\ResourceModel\Banner\CollectionFactory;
+use Vodacom\SiteBanners\Helper\BannerHelper;
 use Magento\Cms\Model\Template\FilterProvider;
 
 /**
  * Class Banner
- * Frontend block for rendering banner content with Page Builder support
+ * Frontend block for rendering banner content
  * 
- * @since V3.0.4 - Created to support Page Builder content rendering on frontend
+ * Version History:
+ * - V3.0.4: Page Builder content rendering with CMS filter
+ * - V5.0.1: Refactored to use BannerHelper (DI pattern demonstration)
  * 
- * Key Features (V3.0.4):
- * - Fetches active banners from database
- * - Filters by is_active, active_from, active_to date ranges
- * - Processes Page Builder HTML through CMS template filter
- * - Handles directives, widgets, and dynamic content
+ * Key Changes in V5.0.1:
+ * - Replaced CollectionFactory with BannerHelper
+ * - Business logic moved to Helper
+ * - Block becomes thin layer for template rendering
  */
 class Banner extends Template
 {
     /**
-     * @var CollectionFactory
+     * @var BannerHelper
      */
-    private CollectionFactory $collectionFactory;
+    private BannerHelper $bannerHelper;
 
     /**
      * @var FilterProvider
@@ -33,71 +34,37 @@ class Banner extends Template
     private FilterProvider $filterProvider;
 
     /**
+     * Banner constructor.
+     * 
+     * Before V5.0.1: Injected CollectionFactory directly
+     * After V5.0.1: Inject Helper which encapsulates business logic
+     * 
      * @param Context $context
-     * @param CollectionFactory $collectionFactory
+     * @param BannerHelper $bannerHelper
      * @param FilterProvider $filterProvider
      * @param array $data
      */
     public function __construct(
         Context $context,
-        CollectionFactory $collectionFactory,
+        BannerHelper $bannerHelper,
         FilterProvider $filterProvider,
         array $data = []
     ) {
-        $this->collectionFactory = $collectionFactory;
+        $this->bannerHelper = $bannerHelper;
         $this->filterProvider = $filterProvider;
         parent::__construct($context, $data);
     }
 
     /**
-     * Get active banners ordered by sort_order
+     * Get active banners
      * 
-     * V3.0.4: Added date range filtering with active_from/active_to
+     * V5.0.1: Business logic moved to Helper - block is thin
      * 
-     * Filtering Logic:
-     * - is_active must be 1 (enabled)
-     * - active_from must be NULL (no start date) OR <= current date/time
-     * - active_to must be NULL (no end date) OR >= current date/time
-     * 
-     * This allows banners to be:
-     * - Always active (both dates NULL)
-     * - Active from specific date onwards (active_from set, active_to NULL)
-     * - Active until specific date (active_from NULL, active_to set)
-     * - Active within date range (both dates set)
-     *
-     * @return \Vodacom\SiteBanners\Model\ResourceModel\Banner\Collection
+     * @return \Vodacom\SiteBanners\Api\Data\BannerInterface[]
      */
-    public function getActiveBanners()
+    public function getActiveBanners(): array
     {
-        $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('is_active', ['eq' => 1]);
-        
-        // V3.0.4: Add date filtering if active_from/active_to are set
-        $now = date('Y-m-d H:i:s');
-        
-        // Filter: active_from is NULL OR active_from <= now
-        // Shows banners that have started or have no start date
-        $collection->addFieldToFilter(
-            'active_from',
-            [
-                ['null' => true],
-                ['lteq' => $now]
-            ]
-        );
-        
-        // Filter: active_to is NULL OR active_to >= now
-        // Shows banners that haven't expired or have no end date
-        $collection->addFieldToFilter(
-            'active_to',
-            [
-                ['null' => true],
-                ['gteq' => $now]
-            ]
-        );
-        
-        $collection->setOrder('sort_order', 'ASC');
-        
-        return $collection;
+        return $this->bannerHelper->getActiveBanners();
     }
 
     /**
@@ -139,16 +106,39 @@ class Banner extends Template
 
     /**
      * Get banner by ID
+     * 
+     * V5.0.1: Use Helper method instead of direct collection
      *
      * @param int $bannerId
-     * @return \Magento\Framework\DataObject
+     * @return \Vodacom\SiteBanners\Api\Data\BannerInterface|null
      */
-    public function getBannerById(int $bannerId)
+    public function getBanner(int $bannerId): ?\Vodacom\SiteBanners\Api\Data\BannerInterface
     {
-        $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('banner_id', ['eq' => $bannerId]);
-        $collection->addFieldToFilter('is_active', ['eq' => 1]);
-        
-        return $collection->getFirstItem();
+        return $this->bannerHelper->getBannerById($bannerId);
+    }
+
+    /**
+     * Check if banner is active
+     * 
+     * V5.0.1: Delegate to Helper
+     * 
+     * @param \Vodacom\SiteBanners\Api\Data\BannerInterface $banner
+     * @return bool
+     */
+    public function isBannerActive(\Vodacom\SiteBanners\Api\Data\BannerInterface $banner): bool
+    {
+        return $this->bannerHelper->isBannerActive($banner);
+    }
+
+    /**
+     * Get banner count
+     * 
+     * V5.0.1: Delegate to Helper
+     * 
+     * @return int
+     */
+    public function getBannerCount(): int
+    {
+        return $this->bannerHelper->getBannerCount(true);
     }
 }

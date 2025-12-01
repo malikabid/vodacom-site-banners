@@ -18,7 +18,7 @@
                 type="Vodacom\SiteBanners\Model\Banner"/>
     
     <preference for="Vodacom\SiteBanners\Api\Data\BannerSearchResultsInterface" 
-                type="Magento\Framework\Api\SearchResults"/>
+                type="Vodacom\SiteBanners\Model\BannerSearchResults"/>
     
     <!-- V4.0.2: Bind repository interface to implementation -->
     <preference for="Vodacom\SiteBanners\Api\BannerRepositoryInterface" 

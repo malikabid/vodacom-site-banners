@@ -41,4 +41,36 @@
         </arguments>
     </virtualType>
     
+    <!-- V5.0.2: Configure Proxy for Heavy Dependency -->
+    <!-- 
+        This tells Magento: When BannerStats asks for HeavyBannerProcessor,
+        inject a Proxy instead of the real class.
+        
+        Proxy = Lightweight placeholder
+        Real class = Only created when you call a method
+        
+        Educational Value:
+        - Shows lazy loading pattern
+        - Demonstrates performance optimization
+        - Illustrates when to use Proxy vs direct injection
+    -->
+    <type name="Vodacom\SiteBanners\Block\BannerStats">
+        <arguments>
+            <argument name="heavyProcessor" xsi:type="object">
+                Vodacom\SiteBanners\Helper\HeavyBannerProcessor\Proxy
+            </argument>
+        </arguments>
+    </type>
+    
+    <!-- V5.0.2: Register Console Command -->
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="vodacom_banner_demo_patterns" xsi:type="object">
+                    Vodacom\SiteBanners\Console\Command\DemonstratePatterns
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    
 </config>

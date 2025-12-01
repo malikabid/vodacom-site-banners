@@ -169,7 +169,7 @@ class BannerService
             $collection = $this->collectionFactory->create();
             
             $collection->addFieldToFilter('sort_order', $sortOrder);
-            $collection->addFieldToFilter('is_active', 1);
+            $collection->addFieldToFilter('is_active', '1');
 
             $result[$sortOrder] = $collection->getItems();
         }
@@ -189,12 +189,12 @@ class BannerService
     {
         // Collection 1: Active banners
         $activeCollection = $this->collectionFactory->create();
-        $activeCollection->addFieldToFilter('is_active', 1);
+        $activeCollection->addFieldToFilter('is_active', '1');
         $activeCount = $activeCollection->getSize();
 
         // Collection 2: Inactive banners (need fresh collection)
         $inactiveCollection = $this->collectionFactory->create();
-        $inactiveCollection->addFieldToFilter('is_active', 0);
+        $inactiveCollection->addFieldToFilter('is_active', '0');
         $inactiveCount = $inactiveCollection->getSize();
 
         // Collection 3: Total banners
@@ -256,7 +256,7 @@ class BannerService
     public function getActiveBannersCount(): int
     {
         $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter('is_active', 1);
+        $collection->addFieldToFilter('is_active', '1');
         return $collection->getSize();
     }
 }

@@ -8,10 +8,13 @@
  * - V4.0.1: Added Data Interfaces and Service Contracts
  * - V4.0.2: Implemented Repository Pattern and refactored controllers
  * - V4.0.3: Exposed REST API endpoints for banner management
+ * - V5.0.1: Implemented Dependency Injection fundamentals with BannerHelper
+ * - V5.0.2: Implemented Factory and Proxy patterns with Service layer
+ * - V5.0.3: Implemented ViewModel pattern - moved business logic from Block to ViewModel
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Vodacom_SiteBanners" setup_version="4.0.3">
+    <module name="Vodacom_SiteBanners" setup_version="5.0.3">
         <sequence>
             <module name="Magento_Theme"/>
             <module name="Magento_Catalog"/>

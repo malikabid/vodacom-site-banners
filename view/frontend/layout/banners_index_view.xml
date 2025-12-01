@@ -3,19 +3,38 @@
 /**
  * Frontend Layout for Site Banners
  * 
- * V3.0.4 Changes:
- * - Added Block class="Vodacom\SiteBanners\Block\Banner" (previously no class specified)
- * - Block now provides Page Builder content filtering via filterContent() method
- * - Template can access getActiveBanners() for database queries
+ * Version History:
+ * V3.0.4: Added Block class for Page Builder content filtering
+ * V5.0.3: Refactored to ViewModel pattern
+ *         - Block changed from custom class to generic Template
+ *         - Business logic moved to BannerViewModel
+ *         - ViewModel injected via <argument> tag
+ *         - Separation of concerns: presentation (template) vs business logic (ViewModel)
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Vodacom Banner Sliders</title>
+    </head>
+
     <body>
         <referenceContainer name="content">
-            <!-- V3.0.4: Added Block class for Page Builder content processing -->
-            <block class="Vodacom\SiteBanners\Block\Banner" 
-                   name="Vodacom_SiteBanners_View" 
-                   template="Vodacom_SiteBanners::view.phtml"/>
+            <!-- 
+                V5.0.3: ViewModel Pattern Implementation
+                - Generic Template block (not custom class)
+                - ViewModel provides all data and business logic
+                - Template focuses purely on presentation
+            -->
+            <block class="Magento\Framework\View\Element\Template" 
+                   name="vodacom.sitebanners.view" 
+                   template="Vodacom_SiteBanners::view.phtml">
+                <arguments>
+                    <!-- Inject ViewModel as argument -->
+                    <argument name="view_model" xsi:type="object">
+                        Vodacom\SiteBanners\ViewModel\BannerViewModel
+                    </argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

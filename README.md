@@ -29,7 +29,9 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V4.0.1   | Data Interfaces            | BannerInterface, Service Contracts, Type Safety, DI Preferences           | `feature/v4.0.1-data-interfaces`          |
 | V4.0.2   | Repository Pattern         | Repository, SearchCriteria, Data Abstraction Layer                        | `feature/v4.0.2-repository-pattern`       |
 | V4.0.3   | REST API                   | webapi.xml, REST Endpoints, API Authentication                            | `feature/v4.0.3-rest-api`                 |
-| V5.0.0   | Dependency Injection       | Constructor Injection, Factories, ViewModel Pattern                       | `feature/v5.0.0-di-factories-viewmodel`   |
+| V5.0.1   | DI Fundamentals            | Constructor Injection, Helper Pattern, Interface Injection                | `feature/v5.0.1-di-fundamentals`          |
+| V5.0.2   | Factories & Proxies        | Factory Pattern, Proxy Pattern, Lazy Loading                              | `feature/v5.0.2-factories-proxies`        |
+| V5.0.3   | ViewModel Pattern          | ArgumentInterface, Layout Injection, Template Logic Separation            | `feature/v5.0.3-viewmodel`                |
 | V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
 
 ---
@@ -54,9 +56,194 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 4.0.3** (Current Branch: `feature/v4.0.3-rest-api`) ✅ **Completed**
+**Version 5.0.3** (Current Branch: `feature/v5.0.3-viewmodel`) ✅ **Completed**
 
-This version demonstrates **REST API Exposure**:
+This version demonstrates **ViewModel Pattern - Separation of Presentation and Business Logic**:
+
+### ViewModel Architecture
+- **BannerViewModel implements ArgumentInterface**:
+  - Pure ViewModel without extending framework base classes
+  - Injected via layout XML `<argument>` tag
+  - Clean separation: Block = rendering, ViewModel = business logic
+  - Improved testability (no dependencies on Block/Context)
+- **Refactored Block to Generic Template**:
+  - Changed from custom `Vodacom\SiteBanners\Block\Banner` to generic `Magento\Framework\View\Element\Template`
+  - Block now only renders template, no business logic
+  - All data retrieval methods moved to ViewModel
+- **Template Updated to Use ViewModel**:
+  - Access ViewModel via `$block->getData('view_model')`
+  - All business logic calls go through ViewModel
+  - Clean template code focused on presentation
+
+### ViewModel Class Dependencies (Constructor Injection)
+1. **BannerRepositoryInterface** - Data access via repository pattern (V4.0.2)
+2. **BannerHelper** - Leverages existing business logic from V5.0.1
+3. **UrlInterface** - URL generation for banner actions
+4. **Escaper** - Safe HTML output
+5. **LoggerInterface** - Error handling and debugging
+6. **FilterProvider** - CMS template filter for Page Builder content (widgets, media URLs, directives)
+
+### ViewModel Public Methods (15+ methods)
+- **Data Retrieval**:
+  - `getActiveBanners()` - Returns array of BannerInterface with caching
+  - `getBanner($id)` - Fetch specific banner by ID
+  - `hasBanners()` - Boolean check for banner existence
+- **Formatting & Display**:
+  - `getFormattedTitle($banner)` - Escaped title with ucfirst
+  - `getBannerContent($banner)` - Page Builder content (HTML safe)
+  - `getBannerExcerpt($banner, $length)` - Truncated plain text
+  - `formatDate($date, $format)` - Date formatting with error handling
+- **Business Logic**:
+  - `isBannerActive($banner)` - Checks is_active flag AND date range
+  - `hasDateRestrictions($banner)` - Check if date-limited
+  - `getBannerCssClasses($banner)` - Dynamic CSS classes based on status
+- **Statistics & Counts**:
+  - `getBannerStatistics()` - Delegates to Helper (total, active, inactive)
+  - `getTotalBannersCount()` - Total banner count
+  - `getActiveBannersCount()` - Count of active banners
+- **Utility Methods**:
+  - `getBannerEditUrl($banner)` - Admin edit link generation
+
+### Files Changed in V5.0.3
+1. **ViewModel/BannerViewModel.php** (NEW - 330+ lines):
+   - Implements ArgumentInterface (ViewModel requirement)
+   - 15+ public methods for business logic
+   - Instance caching for performance
+   - Comprehensive error handling with logger
+   - FilterProvider integration for Page Builder content filtering
+
+2. **view/frontend/layout/banners_index_view.xml** (UPDATED):
+   - Changed Block class: `Vodacom\SiteBanners\Block\Banner` → `Magento\Framework\View\Element\Template`
+   - Added `<argument>` tag to inject BannerViewModel
+   - ViewModel injected as object type
+
+3. **view/frontend/templates/view.phtml** (UPDATED):
+   - Changed from `$block->method()` to `$viewModel->method()` pattern
+   - Uses `$block->escapeHtml()` and `$block->escapeHtmlAttr()` directly (no separate $escaper)
+   - Cleaner template focusing on presentation
+   - Uses `$block->getData('view_model')` to access ViewModel
+
+4. **etc/module.xml** (UPDATED):
+   - Version bumped from 5.0.2 to 5.0.3
+   - Added version history comment
+
+5. **README.md** (UPDATED):
+   - Added V5.0.3 feature documentation
+   - Updated version history and current version marker
+
+### Key Architectural Patterns
+- **ArgumentInterface** - Required interface for ViewModels in layout XML
+- **Dependency Injection via Layout** - ViewModel injected through XML, not constructor
+- **Separation of Concerns** - Clear boundary between presentation (template) and logic (ViewModel)
+- **Testability** - ViewModels easier to unit test than Blocks
+- **Composition over Inheritance** - ViewModel doesn't extend any framework class
+- **Performance** - Instance caching prevents redundant queries
+
+### Why ViewModel vs Block?
+- **Blocks**: Tied to layout system, harder to test, mixed responsibilities
+- **ViewModels**: Pure PHP classes, easy to test, single responsibility
+- **When to use ViewModel**:
+  - Complex business logic needed in templates
+  - Reusable logic across multiple templates
+  - Need better testability
+  - Want clean separation of concerns
+
+---
+
+## Previous Version Features
+
+**Version 5.0.2** - **Factory and Proxy Patterns**:
+
+### Factory Pattern Features
+- **BannerService with Factory Usage**:
+  - `Service/BannerService.php` - Business logic layer using Factories
+  - Creates Banner instances using `BannerInterfaceFactory` (auto-generated)
+  - Uses `CollectionFactory` for batch operations
+  - Demonstrates Factory pattern for object creation
+- **Console Command Demonstration**:
+  - `Console/Command/DemonstratePatterns.php` - Tests Factory and Proxy patterns
+  - Shows BannerInterfaceFactory vs CollectionFactory usage
+  - Demonstrates lazy loading with Proxy
+  - Benchmarks Factory performance
+
+### Proxy Pattern Features
+- **HeavyBannerProcessor with Proxy**:
+  - `Helper/HeavyBannerProcessor.php` - Simulates expensive operations
+  - Injected as Proxy in di.xml configuration
+  - Only instantiates when method is called (lazy loading)
+  - Prevents unnecessary resource consumption
+- **BannerStats Block with Proxy Injection**:
+  - `Block/BannerStats.php` - Demonstrates Proxy usage
+  - HeavyBannerProcessor injected as Proxy
+  - Processor only loads if statistics are requested
+  - Shows performance benefits of lazy loading
+
+### Key Factory & Proxy Concepts
+- **Auto-Generated Factories**:
+  - Magento creates `*Factory` classes automatically
+  - Usage: `$this->bannerFactory->create()` or `$this->bannerFactory->create(['data' => []])`
+  - No need to create Factory PHP files manually
+- **Proxy Configuration in di.xml**:
+  - Add `/Proxy` suffix to class name in di.xml
+  - Magento generates Proxy class at runtime
+  - Proxy intercepts first method call and instantiates real object
+- **When to Use**:
+  - **Factory**: Creating new instances (models, collections, data objects)
+  - **Proxy**: Injecting expensive classes that may not be used
+
+**Version 5.0.1** - **Dependency Injection Fundamentals**:
+- **Helper Class with Constructor Injection**:
+  - `Helper/BannerHelper.php` - Business logic encapsulation
+  - Injects 5 dependencies via constructor (proper DI pattern)
+  - Uses interface injection (BannerRepositoryInterface, not concrete class)
+  - Demonstrates type declarations on all constructor parameters
+- **Block Refactoring**:
+  - Changed from CollectionFactory to BannerHelper injection
+  - Block becomes thin delegation layer (separation of concerns)
+  - All business logic moved to Helper
+  - Maintains backwards compatibility (same public methods)
+- **Type Safety**:
+  - Strict type declarations on all methods
+  - Interface injection for loose coupling
+  - Returns array of BannerInterface (not Collection)
+- **SearchCriteria Builder Pattern**:
+  - FilterBuilder for is_active and date filtering
+  - SortOrderBuilder for proper ordering
+  - Demonstrates SearchCriteria construction
+
+### Helper Class Dependencies (Constructor Injection)
+1. **Context** - Base helper functionality
+2. **BannerRepositoryInterface** - Interface injection (not BannerRepository concrete class)
+3. **SearchCriteriaBuilder** - Build complex search queries
+4. **FilterBuilder** - Create filter conditions
+5. **SortOrderBuilder** - Create sort order objects
+6. **DateTime** - Current date/time for date filtering
+
+### Refactored Block Class
+- **Removed**: CollectionFactory dependency
+- **Added**: BannerHelper dependency
+- **Methods Changed**:
+  - `getActiveBanners()` - Returns `array` instead of `Collection`
+  - Delegates to Helper for business logic
+  - Template updated: `$banners->getSize()` → `count($banners)`
+
+### Fixed Issues
+- **BannerSearchResults Class**: Created proper implementation of BannerSearchResultsInterface
+- **di.xml Updated**: Changed preference from generic SearchResults to BannerSearchResults
+- **Template Compatibility**: Updated view.phtml to work with array instead of Collection
+
+### Key Architectural Patterns
+- **Constructor Injection** over property injection or ObjectManager
+- **Interface Injection** over concrete class injection
+- **Separation of Concerns**: Business logic in Helper, presentation in Block
+- **Type Safety**: Strict types throughout
+- **Delegation Pattern**: Block delegates to Helper
+
+---
+
+## Previous Version Features
+
+**Version 4.0.3** - **REST API Exposure**:
 
 ### REST API Features
 - **Complete CRUD Operations via REST**:
@@ -180,7 +367,47 @@ This version demonstrates **REST API Exposure**:
 
 ## Version History
 
-### Version 4.0.3 (Current)
+### Version 5.0.1 (Current)
+**Branch:** `feature/v5.0.1-di-fundamentals`  
+**Focus:** Dependency Injection Fundamentals with Helper Pattern  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created `Helper/BannerHelper.php` with 5 constructor-injected dependencies
+- Refactored `Block/Banner.php` to use Helper instead of CollectionFactory
+- Moved business logic from Block to Helper (separation of concerns)
+- Updated `Model/BannerSearchResults.php` - proper implementation of SearchResultsInterface
+- Fixed `etc/di.xml` - changed SearchResults preference to BannerSearchResults
+- Updated `view/frontend/templates/view.phtml` - array compatibility (count vs getSize)
+- Module version updated to 5.0.1
+
+**Files Created:**
+- `Helper/BannerHelper.php` - Business logic with proper DI pattern
+- `Model/BannerSearchResults.php` - Type-safe SearchResults implementation
+
+**Files Modified:**
+- `Block/Banner.php` - Refactored to delegate to Helper
+- `etc/module.xml` - Version updated to 5.0.1
+- `etc/di.xml` - Fixed BannerSearchResultsInterface preference
+- `view/frontend/templates/view.phtml` - Array compatibility updates
+
+**Key Concepts Demonstrated:**
+- Constructor injection with type declarations
+- Interface injection (BannerRepositoryInterface) for loose coupling
+- Helper pattern for business logic encapsulation
+- SearchCriteria builder pattern (FilterBuilder, SortOrderBuilder)
+- Block as thin delegation layer
+- Strict type safety throughout
+- Proper DI container usage (no ObjectManager)
+
+**Breaking Changes:**
+- `Block::getActiveBanners()` now returns `array` instead of `Collection`
+- Template updated to use `count($banners)` instead of `$banners->getSize()`
+- No breaking changes for external API consumers
+
+---
+
+### Version 4.0.3
 **Branch:** `feature/v4.0.3-rest-api`  
 **Focus:** REST API Exposure  
 **Status:** ✅ Completed

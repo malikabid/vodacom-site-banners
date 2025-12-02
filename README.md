@@ -32,7 +32,9 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V5.0.1   | DI Fundamentals            | Constructor Injection, Helper Pattern, Interface Injection                | `feature/v5.0.1-di-fundamentals`          |
 | V5.0.2   | Factories & Proxies        | Factory Pattern, Proxy Pattern, Lazy Loading                              | `feature/v5.0.2-factories-proxies`        |
 | V5.0.3   | ViewModel Pattern          | ArgumentInterface, Layout Injection, Template Logic Separation            | `feature/v5.0.3-viewmodel`                |
-| V6.0.0   | Extensibility (Plugins)    | Before, Around, After Plugins (Interceptors) on core Magento classes      | `feature/v6.0.0-extensibility-plugins`    |
+| V6.0.1   | Before Plugins             | Before Plugin Implementation, Argument Modification, Logging              | `feature/v6.0.1-before-plugins`           |
+| V6.0.2   | After Plugins              | After Plugin Implementation, Result Modification, Plugin Chaining         | `feature/v6.0.2-after-plugins`            |
+| V6.0.3   | Around Plugins             | Around Plugin Implementation, Interceptor Chain, Caching Layer            | `feature/v6.0.3-around-plugins`           |
 
 ---
 
@@ -1399,6 +1401,85 @@ $collection = $bannerCollectionFactory->create()
 - Layout XML and template files
 - Basic block implementation
 
+### Version 6.0.1
+**Branch:** `feature/v6.0.1-before-plugins`  
+**Focus:** Before Plugin Implementation  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Before Plugin: `Plugin/BannerRepositoryTitleSanitizer.php`
+  - Automatically sanitizes banner titles before save
+  - Trims whitespace and converts to Title Case
+  - Demonstrates argument modification pattern (returns array)
+- Created Before Plugin: `Plugin/BannerRepositorySaveLogger.php`
+  - Logs all banner CREATE/UPDATE operations
+  - Provides audit trail for banner modifications
+  - Demonstrates logging pattern (returns void)
+- Configured plugins in `etc/di.xml` with proper sortOrder
+  - TitleSanitizer (sortOrder 5) - executes first
+  - SaveLogger (sortOrder 10) - executes second, logs sanitized title
+- Updated module version to 6.0.1
+
+**Files Changed:**
+- `Plugin/BannerRepositoryTitleSanitizer.php` - NEW: Title sanitization before plugin
+- `Plugin/BannerRepositorySaveLogger.php` - NEW: Save operation logging before plugin
+- `etc/di.xml` - Added plugin configuration with sortOrder
+- `etc/module.xml` - Updated version to 6.0.1
+- `README.md` - Updated documentation with V6.0.1 details
+
+**Key Concepts Demonstrated:**
+- **Before Plugin Basics**: Method naming convention `before{MethodName}`
+- **Argument Modification**: Returning array to modify method parameters
+- **Logging Pattern**: Returning void when not modifying arguments
+- **Plugin Priority**: Using sortOrder to control execution order
+- **Multiple Plugins**: Chaining multiple plugins on same method
+- **Audit Trail**: Implementing logging for compliance/debugging
+- **Data Sanitization**: Automatic data cleaning without changing business logic
+
+**Plugin Execution Flow:**
+```
+save() method call:
+1. TitleSanitizer::beforeSave() (sortOrder 5)
+   - Sanitizes title (trim, Title Case)
+   - Returns modified banner
+2. SaveLogger::beforeSave() (sortOrder 10)
+   - Logs CREATE or UPDATE operation
+   - Logs sanitized title
+   - Returns void (no modification)
+3. Original BannerRepository::save() executes
+   - Receives sanitized banner
+   - Saves to database
+```
+
+**Testing Before Plugins:**
+```bash
+# Run setup:upgrade to apply changes
+bin/magento setup:upgrade
+bin/magento cache:flush
+
+# Edit a banner in admin with messy title: "  test   BANNER  "
+# Save banner
+
+# Check logs
+tail -f var/log/system.log
+
+# Expected log entries:
+# 1. "Banner title sanitized" - original: "  test   BANNER  ", sanitized: "Test Banner"
+# 2. "Banner UPDATE operation initiated: Test Banner"
+# 3. Banner saved with clean title in database
+```
+
+**Real-World Use Cases:**
+- **Title Sanitization**: Ensures consistent formatting across all banners
+- **Audit Logging**: Track who created/modified banners and when
+- **Data Validation**: Enforce data quality rules without modifying repository
+- **Compliance**: Meet regulatory requirements for activity logging
+- **Debugging**: Trace save operations during development
+
+**Next Steps:**
+- V6.0.2: Implement After Plugins to modify return values and enhance banner data
+- V6.0.3: Implement Around Plugins for caching and performance optimization
+
 ---
 
 ## Next Steps
@@ -1408,4 +1489,5 @@ To explore more advanced concepts:
 - **V3.0.0**: Create admin grids and forms with UI Components
 - **V4.0.0**: Implement service contracts and REST APIs
 - **V5.0.0**: Master dependency injection and ViewModels
+- **V6.0.x**: Master plugin patterns (Before, After, Around)
 - **V6.0.0**: Extend core functionality using plugins

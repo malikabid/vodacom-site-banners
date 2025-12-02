@@ -73,4 +73,40 @@
         </arguments>
     </type>
     
+    <!-- V6.0.1: Before Plugins Configuration -->
+    <!--
+        Before Plugins: Execute BEFORE the original method
+        
+        Plugin Naming Convention:
+        - name: Unique identifier (snake_case recommended)
+        - type: Full class name of plugin
+        - sortOrder: Execution order (lower = earlier)
+        
+        Plugin Method Naming:
+        - Pattern: before{OriginalMethodName}
+        - Example: beforeSave() intercepts save()
+        
+        Execution Flow:
+        1. TitleSanitizer::beforeSave() (sortOrder 5) - Modifies title
+        2. SaveLogger::beforeSave() (sortOrder 10) - Logs operation
+        3. Original BannerRepository::save() executes
+        
+        Use Cases:
+        - Input validation
+        - Data sanitization
+        - Logging/auditing
+        - Permission checks
+    -->
+    <type name="Vodacom\SiteBanners\Model\BannerRepository">
+        <!-- Title Sanitizer Plugin - Executes FIRST (lowest sortOrder) -->
+        <plugin name="banner_repository_title_sanitizer" 
+                type="Vodacom\SiteBanners\Plugin\BannerRepositoryTitleSanitizer" 
+                sortOrder="5"/>
+        
+        <!-- Save Logger Plugin - Executes SECOND (higher sortOrder) -->
+        <plugin name="banner_repository_save_logger" 
+                type="Vodacom\SiteBanners\Plugin\BannerRepositorySaveLogger" 
+                sortOrder="10"/>
+    </type>
+    
 </config>

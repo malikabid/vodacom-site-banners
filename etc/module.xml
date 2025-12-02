@@ -14,10 +14,11 @@
  * - V6.0.1: Implemented Before Plugins - TitleSanitizer and SaveLogger
  * - V6.0.2: Implemented After Plugins - DataEnhancer, SearchResultsEnhancer, DeleteValidator
  * - V6.0.3: Implemented Around Plugins - CacheLayer, PerformanceMonitor, CircuitBreaker
+ * - V7.0.0: Implemented Widget System - Display banners on any page with drag-and-drop
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Vodacom_SiteBanners" setup_version="6.0.3">
+    <module name="Vodacom_SiteBanners" setup_version="7.0.0">
         <sequence>
             <module name="Magento_Theme"/>
             <module name="Magento_Catalog"/>
@@ -25,6 +26,9 @@
             <module name="Magento_Ui"/>
             <!-- V3.0.4: Added for Page Builder integration in admin form -->
             <module name="Magento_PageBuilder"/>
+            <!-- V7.0.0: Added for Widget System integration -->
+            <module name="Magento_Widget"/>
+            <module name="Magento_Cms"/>
         </sequence>
     </module>
 </config>

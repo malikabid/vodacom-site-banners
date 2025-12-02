@@ -1,0 +1,183 @@
+<?php
+/**
+ * Vodacom SiteBanners Widget Template - Default
+ * 
+ * Displays banners in various layouts based on widget configuration
+ * Supports: single, multiple (list), grid, slider modes
+ * 
+ * @var \Vodacom\SiteBanners\Block\Widget\BannerWidget $block
+ * @version 7.0.0
+ */
+
+$banners = $block->getBanners();
+$displayMode = $block->getDisplayMode();
+$cssClass = $block->getCssClass();
+$showTitle = $block->shouldShowTitle();
+$showContent = $block->shouldShowContent();
+
+if (empty($banners)): ?>
+    <!-- No banners to display -->
+    <?php return; ?>
+<?php endif; ?>
+
+<div class="<?= $block->escapeHtmlAttr($cssClass) ?>" data-display-mode="<?= $block->escapeHtmlAttr($displayMode) ?>">
+    
+    <?php if ($displayMode === 'single'): ?>
+        <!-- Single Banner Display -->
+        <?php $banner = reset($banners); ?>
+        <div class="banner-item banner-single" data-banner-id="<?= (int)$banner->getBannerId() ?>">
+            <?php if ($showTitle): ?>
+                <div class="banner-title">
+                    <h2><?= $block->escapeHtml($banner->getTitle()) ?></h2>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($showContent && $banner->getContent()): ?>
+                <div class="banner-content">
+                    <?= /* @noEscape */ $block->filterContent($banner->getContent()) ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if ($banner->getActiveFrom() || $banner->getActiveTo()): ?>
+                <div class="banner-dates">
+                    <?php if ($banner->getActiveFrom()): ?>
+                        <span class="banner-date-from">
+                            <?= __('From: %1', $block->escapeHtml($banner->getActiveFrom())) ?>
+                        </span>
+                    <?php endif; ?>
+                    
+                    <?php if ($banner->getActiveTo()): ?>
+                        <span class="banner-date-to">
+                            <?= __('Until: %1', $block->escapeHtml($banner->getActiveTo())) ?>
+                        </span>
+                    <?php endif; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+    <?php elseif ($displayMode === 'multiple'): ?>
+        <!-- Multiple Banners Display (List) -->
+        <div class="banner-list">
+            <?php foreach ($banners as $banner): ?>
+                <div class="banner-item banner-list-item" data-banner-id="<?= (int)$banner->getBannerId() ?>">
+                    <?php if ($showTitle): ?>
+                        <div class="banner-title">
+                            <h3><?= $block->escapeHtml($banner->getTitle()) ?></h3>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($showContent && $banner->getContent()): ?>
+                        <div class="banner-content">
+                            <?= /* @noEscape */ $block->filterContent($banner->getContent()) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        
+    <?php elseif ($displayMode === 'grid'): ?>
+        <!-- Grid Display (2 columns) -->
+        <div class="banner-grid">
+            <?php foreach ($banners as $banner): ?>
+                <div class="banner-item banner-grid-item" data-banner-id="<?= (int)$banner->getBannerId() ?>">
+                    <?php if ($showTitle): ?>
+                        <div class="banner-title">
+                            <h3><?= $block->escapeHtml($banner->getTitle()) ?></h3>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <?php if ($showContent && $banner->getContent()): ?>
+                        <div class="banner-content">
+                            <?= /* @noEscape */ $block->filterContent($banner->getContent()) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+        
+    <?php elseif ($displayMode === 'slider'): ?>
+        <!-- Slider Display (Carousel) -->
+        <div class="banner-slider" data-slider-init="true">
+            <div class="banner-slider-track">
+                <?php foreach ($banners as $banner): ?>
+                    <div class="banner-item banner-slide" data-banner-id="<?= (int)$banner->getBannerId() ?>">
+                        <?php if ($showTitle): ?>
+                            <div class="banner-title">
+                                <h3><?= $block->escapeHtml($banner->getTitle()) ?></h3>
+                            </div>
+                        <?php endif; ?>
+                        
+                        <?php if ($showContent && $banner->getContent()): ?>
+                            <div class="banner-content">
+                                <?= /* @noEscape */ $block->filterContent($banner->getContent()) ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            
+            <?php if (count($banners) > 1): ?>
+                <div class="banner-slider-controls">
+                    <button class="slider-prev" aria-label="<?= $block->escapeHtmlAttr(__('Previous')) ?>">
+                        <span>‹</span>
+                    </button>
+                    <button class="slider-next" aria-label="<?= $block->escapeHtmlAttr(__('Next')) ?>">
+                        <span>›</span>
+                    </button>
+                </div>
+                
+                <div class="banner-slider-dots">
+                    <?php foreach ($banners as $index => $banner): ?>
+                        <button class="slider-dot <?= $index === 0 ? 'active' : '' ?>" 
+                                data-slide="<?= (int)$index ?>"
+                                aria-label="<?= $block->escapeHtmlAttr(__('Go to slide %1', $index + 1)) ?>">
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+        
+        <script>
+        require(['jquery'], function($) {
+            'use strict';
+            
+            $(document).ready(function() {
+                $('.banner-slider[data-slider-init="true"]').each(function() {
+                    var $slider = $(this);
+                    var $track = $slider.find('.banner-slider-track');
+                    var $slides = $track.find('.banner-slide');
+                    var $dots = $slider.find('.slider-dot');
+                    var currentSlide = 0;
+                    var totalSlides = $slides.length;
+                    
+                    if (totalSlides <= 1) return;
+                    
+                    function showSlide(index) {
+                        currentSlide = (index + totalSlides) % totalSlides;
+                        $track.css('transform', 'translateX(-' + (currentSlide * 100) + '%)');
+                        $dots.removeClass('active').eq(currentSlide).addClass('active');
+                    }
+                    
+                    $slider.find('.slider-prev').on('click', function() {
+                        showSlide(currentSlide - 1);
+                    });
+                    
+                    $slider.find('.slider-next').on('click', function() {
+                        showSlide(currentSlide + 1);
+                    });
+                    
+                    $dots.on('click', function() {
+                        showSlide($(this).data('slide'));
+                    });
+                    
+                    // Auto-play (optional - 5 seconds)
+                    setInterval(function() {
+                        showSlide(currentSlide + 1);
+                    }, 5000);
+                });
+            });
+        });
+        </script>
+    <?php endif; ?>
+    
+</div>

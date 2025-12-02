@@ -35,6 +35,7 @@ Development follows a progressive, branch-based approach to isolate key concepts
 | V6.0.1   | Before Plugins             | Before Plugin Implementation, Argument Modification, Logging              | `feature/v6.0.1-before-plugins`           |
 | V6.0.2   | After Plugins              | After Plugin Implementation, Result Modification, Plugin Chaining         | `feature/v6.0.2-after-plugins`            |
 | V6.0.3   | Around Plugins             | Around Plugin Implementation, Interceptor Chain, Caching Layer            | `feature/v6.0.3-around-plugins`           |
+| V7.0.0   | Widget System              | Widget Configuration, Block Implementation, Template Variants, CMS Integration | `feature/v7.0.0-widget-integration` |
 
 ---
 
@@ -58,7 +59,82 @@ Development follows a progressive, branch-based approach to isolate key concepts
 
 ## Current Version Features
 
-**Version 5.0.3** (Current Branch: `feature/v5.0.3-viewmodel`) ✅ **Completed**
+**Version 7.0.0** (Current Branch: `feature/v7.0.0-widget-integration`) 🚧 **In Development**
+
+This version demonstrates **Widget System Integration - Display Banners Anywhere**:
+
+### Widget System Architecture
+- **Widget Configuration (etc/widget.xml)**:
+  - Multi-parameter widget with conditional fields
+  - Display modes: single, multiple (list), grid, slider
+  - Banner selection via dropdown or comma-separated IDs
+  - Sort options: sort_order, created_at, title, random
+  - Template variants: default, compact, minimal
+  - Supported containers: content, sidebar, etc.
+- **Widget Block Class**:
+  - Implements `BlockInterface` for widget compatibility
+  - Extends `Template` for template rendering
+  - Repository-based data fetching with SearchCriteria
+  - Date range filtering (active_from/active_to)
+  - Content filtering via CMS FilterProvider
+  - Cache key optimization
+- **Three Template Variants**:
+  - **Default**: Full-featured with all display modes, slider JavaScript
+  - **Compact**: Sidebar-friendly with minimal spacing
+  - **Minimal**: Title-only display for navigation
+- **Banner Source Model**:
+  - Dropdown option source for admin widget configuration
+  - Fetches active banners with ID and title
+  - Error handling for empty/failed queries
+
+### Widget Display Modes
+1. **Single Banner**: Display one specific banner
+2. **Multiple (List)**: Vertical list of banners
+3. **Grid**: 2-column responsive grid layout
+4. **Slider/Carousel**: Auto-rotating banner slider with controls
+
+### Widget Parameters
+- `display_mode`: Choose layout (single/multiple/grid/slider)
+- `banner_id`: Select specific banner (single mode)
+- `banner_ids`: Comma-separated IDs (multiple/grid/slider modes)
+- `show_title`: Display/hide banner titles
+- `show_content`: Display/hide banner content
+- `limit`: Maximum banners to display
+- `sort_by`: Sort field (sort_order/created_at/title/random)
+- `sort_direction`: ASC/DESC ordering
+- `css_class`: Custom CSS class for styling
+- `template`: Choose template variant
+
+### CMS/Page Builder Integration
+- **Widget Insertion**: Content > Widgets > "Add Widget"
+- **Page Builder Drag-and-Drop**: Insert widget via Page Builder interface
+- **Layout XML Placement**: Programmatic widget placement in any container
+- **Email Compatibility**: Widget marked as `is_email_compatible="true"`
+
+### Files Added in V7.0.0
+- `etc/widget.xml` - Widget configuration with parameters
+- `Model/Config/Source/BannerOptions.php` - Banner dropdown source
+- `Block/Widget/BannerWidget.php` - Widget block implementation
+- `view/frontend/templates/widget/banner.phtml` - Default template
+- `view/frontend/templates/widget/banner_compact.phtml` - Compact template
+- `view/frontend/templates/widget/banner_minimal.phtml` - Minimal template
+- `view/frontend/web/css/widget.css` - Widget-specific styles
+- `view/frontend/layout/default.xml` - Global CSS inclusion
+
+### Files Modified in V7.0.0
+- `etc/module.xml` - Version 6.0.3 → 7.0.0, added Magento_Widget/Magento_Cms dependencies
+- `README.md` - Updated documentation with V7.0.0 details
+
+---
+
+## Previous Version Features
+
+### Version 6.0.3 (Branch: `feature/v6.0.3-around-plugins`) ✅ **Completed**
+
+This version demonstrates **Around Plugins - Complete Method Control**:
+(Content preserved from previous version...)
+
+### Version 5.0.3 (Branch: `feature/v5.0.3-viewmodel`) ✅ **Completed**
 
 This version demonstrates **ViewModel Pattern - Separation of Presentation and Business Logic**:
 

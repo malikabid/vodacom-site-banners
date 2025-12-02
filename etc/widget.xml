@@ -1,0 +1,247 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Vodacom SiteBanners Widget Configuration
+ * 
+ * Defines widget for displaying banners in CMS pages, product pages, category pages, etc.
+ * Supports multiple display modes: single banner, multiple banners, grid, slider
+ * 
+ * @version 7.0.0
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    
+    <!-- Site Banner Widget -->
+    <widget id="vodacom_sitebanners_widget"
+            class="Vodacom\SiteBanners\Block\Widget\BannerWidget"
+            is_email_compatible="true"
+            placeholder_image="Vodacom_SiteBanners::images/widget_placeholder.png">
+        
+        <label translate="true">Site Banners Widget</label>
+        <description translate="true">Display site banners in various layouts (single, grid, slider)</description>
+        
+        <parameters>
+            <!-- Display Mode Parameter -->
+            <parameter name="display_mode" xsi:type="select" required="true" visible="true" sort_order="10">
+                <label translate="true">Display Mode</label>
+                <description translate="true">Choose how to display banners</description>
+                <options>
+                    <option name="single" value="single" selected="true">
+                        <label translate="true">Single Banner</label>
+                    </option>
+                    <option name="multiple" value="multiple">
+                        <label translate="true">Multiple Banners (List)</label>
+                    </option>
+                    <option name="grid" value="grid">
+                        <label translate="true">Grid Layout (2 columns)</label>
+                    </option>
+                    <option name="slider" value="slider">
+                        <label translate="true">Slider/Carousel</label>
+                    </option>
+                </options>
+            </parameter>
+            
+            <!-- Banner Selection Parameter (for single mode) -->
+            <parameter name="banner_id" xsi:type="select" required="false" visible="true" sort_order="20">
+                <label translate="true">Select Banner</label>
+                <description translate="true">Choose specific banner (required for Single mode)</description>
+                <depends>
+                    <parameter name="display_mode" value="single"/>
+                </depends>
+                <source_model>Vodacom\SiteBanners\Model\Config\Source\BannerOptions</source_model>
+            </parameter>
+            
+            <!-- Banner IDs Parameter (for multiple/grid modes) -->
+            <parameter name="banner_ids" xsi:type="text" required="false" visible="true" sort_order="30">
+                <label translate="true">Banner IDs</label>
+                <description translate="true">Comma-separated banner IDs (e.g., 1,2,3). Leave empty for all active banners.</description>
+                <depends>
+                    <parameter name="display_mode" value="multiple"/>
+                </depends>
+            </parameter>
+            
+            <parameter name="banner_ids_grid" xsi:type="text" required="false" visible="true" sort_order="31">
+                <label translate="true">Banner IDs</label>
+                <description translate="true">Comma-separated banner IDs (e.g., 1,2,3). Leave empty for all active banners.</description>
+                <depends>
+                    <parameter name="display_mode" value="grid"/>
+                </depends>
+            </parameter>
+            
+            <parameter name="banner_ids_slider" xsi:type="text" required="false" visible="true" sort_order="32">
+                <label translate="true">Banner IDs</label>
+                <description translate="true">Comma-separated banner IDs (e.g., 1,2,3). Leave empty for all active banners.</description>
+                <depends>
+                    <parameter name="display_mode" value="slider"/>
+                </depends>
+            </parameter>
+            
+            <!-- Show Title Parameter -->
+            <parameter name="show_title" xsi:type="select" required="false" visible="true" sort_order="40">
+                <label translate="true">Show Banner Title</label>
+                <description translate="true">Display banner title</description>
+                <options>
+                    <option name="yes" value="1" selected="true">
+                        <label translate="true">Yes</label>
+                    </option>
+                    <option name="no" value="0">
+                        <label translate="true">No</label>
+                    </option>
+                </options>
+            </parameter>
+            
+            <!-- Show Content Parameter -->
+            <parameter name="show_content" xsi:type="select" required="false" visible="true" sort_order="50">
+                <label translate="true">Show Banner Content</label>
+                <description translate="true">Display banner content/description</description>
+                <options>
+                    <option name="yes" value="1" selected="true">
+                        <label translate="true">Yes</label>
+                    </option>
+                    <option name="no" value="0">
+                        <label translate="true">No</label>
+                    </option>
+                </options>
+            </parameter>
+            
+            <!-- Limit Parameter -->
+            <parameter name="limit" xsi:type="text" required="false" visible="true" sort_order="60">
+                <label translate="true">Limit</label>
+                <description translate="true">Maximum number of banners to display (leave empty for no limit)</description>
+                <depends>
+                    <parameter name="display_mode" value="multiple"/>
+                </depends>
+            </parameter>
+            
+            <parameter name="limit_grid" xsi:type="text" required="false" visible="true" sort_order="61">
+                <label translate="true">Limit</label>
+                <description translate="true">Maximum number of banners to display (leave empty for no limit)</description>
+                <depends>
+                    <parameter name="display_mode" value="grid"/>
+                </depends>
+            </parameter>
+            
+            <parameter name="limit_slider" xsi:type="text" required="false" visible="true" sort_order="62">
+                <label translate="true">Limit</label>
+                <description translate="true">Maximum number of banners to display (leave empty for no limit)</description>
+                <depends>
+                    <parameter name="display_mode" value="slider"/>
+                </depends>
+            </parameter>
+            
+            <!-- Sort Order Parameter -->
+            <parameter name="sort_by" xsi:type="select" required="false" visible="true" sort_order="70">
+                <label translate="true">Sort By</label>
+                <description translate="true">Sort banners by field</description>
+                <options>
+                    <option name="sort_order" value="sort_order" selected="true">
+                        <label translate="true">Sort Order</label>
+                    </option>
+                    <option name="created_at" value="created_at">
+                        <label translate="true">Created Date</label>
+                    </option>
+                    <option name="title" value="title">
+                        <label translate="true">Title</label>
+                    </option>
+                    <option name="random" value="random">
+                        <label translate="true">Random</label>
+                    </option>
+                </options>
+            </parameter>
+            
+            <!-- Sort Direction Parameter -->
+            <parameter name="sort_direction" xsi:type="select" required="false" visible="true" sort_order="80">
+                <label translate="true">Sort Direction</label>
+                <description translate="true">Sort direction</description>
+                <options>
+                    <option name="asc" value="ASC" selected="true">
+                        <label translate="true">Ascending</label>
+                    </option>
+                    <option name="desc" value="DESC">
+                        <label translate="true">Descending</label>
+                    </option>
+                </options>
+                <depends>
+                    <parameter name="sort_by" value="sort_order"/>
+                </depends>
+            </parameter>
+            
+            <parameter name="sort_direction_date" xsi:type="select" required="false" visible="true" sort_order="81">
+                <label translate="true">Sort Direction</label>
+                <description translate="true">Sort direction</description>
+                <options>
+                    <option name="asc" value="ASC">
+                        <label translate="true">Ascending (Oldest First)</label>
+                    </option>
+                    <option name="desc" value="DESC" selected="true">
+                        <label translate="true">Descending (Newest First)</label>
+                    </option>
+                </options>
+                <depends>
+                    <parameter name="sort_by" value="created_at"/>
+                </depends>
+            </parameter>
+            
+            <parameter name="sort_direction_title" xsi:type="select" required="false" visible="true" sort_order="82">
+                <label translate="true">Sort Direction</label>
+                <description translate="true">Sort direction</description>
+                <options>
+                    <option name="asc" value="ASC" selected="true">
+                        <label translate="true">A-Z</label>
+                    </option>
+                    <option name="desc" value="DESC">
+                        <label translate="true">Z-A</label>
+                    </option>
+                </options>
+                <depends>
+                    <parameter name="sort_by" value="title"/>
+                </depends>
+            </parameter>
+            
+            <!-- CSS Class Parameter -->
+            <parameter name="css_class" xsi:type="text" required="false" visible="true" sort_order="90">
+                <label translate="true">Custom CSS Class</label>
+                <description translate="true">Add custom CSS class to widget container</description>
+            </parameter>
+            
+            <!-- Template Parameter -->
+            <parameter name="template" xsi:type="select" required="false" visible="true" sort_order="100">
+                <label translate="true">Template</label>
+                <description translate="true">Choose custom template (advanced)</description>
+                <options>
+                    <option name="default" value="Vodacom_SiteBanners::widget/banner.phtml" selected="true">
+                        <label translate="true">Default</label>
+                    </option>
+                    <option name="compact" value="Vodacom_SiteBanners::widget/banner_compact.phtml">
+                        <label translate="true">Compact (No spacing)</label>
+                    </option>
+                    <option name="minimal" value="Vodacom_SiteBanners::widget/banner_minimal.phtml">
+                        <label translate="true">Minimal (Title only)</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+        
+        <!-- Supported containers for widget placement -->
+        <supported_containers>
+            <container name="content">
+                <template name="default" value="Vodacom_SiteBanners::widget/banner.phtml"/>
+                <template name="compact" value="Vodacom_SiteBanners::widget/banner_compact.phtml"/>
+                <template name="minimal" value="Vodacom_SiteBanners::widget/banner_minimal.phtml"/>
+            </container>
+            <container name="content.top">
+                <template name="default" value="Vodacom_SiteBanners::widget/banner.phtml"/>
+            </container>
+            <container name="content.bottom">
+                <template name="default" value="Vodacom_SiteBanners::widget/banner.phtml"/>
+            </container>
+            <container name="sidebar.main">
+                <template name="default" value="Vodacom_SiteBanners::widget/banner_compact.phtml"/>
+            </container>
+            <container name="sidebar.additional">
+                <template name="default" value="Vodacom_SiteBanners::widget/banner_compact.phtml"/>
+            </container>
+        </supported_containers>
+    </widget>
+</widgets>

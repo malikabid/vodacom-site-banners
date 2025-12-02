@@ -1,0 +1,27 @@
+<?php
+/**
+ * Vodacom SiteBanners Widget Template - Minimal
+ * 
+ * Minimal layout showing only titles, ideal for navigation or quick links
+ * 
+ * @var \Vodacom\SiteBanners\Block\Widget\BannerWidget $block
+ * @version 7.0.0
+ */
+
+$banners = $block->getBanners();
+$cssClass = $block->getCssClass() . ' banner-minimal';
+
+if (empty($banners)): ?>
+    <!-- No banners to display -->
+    <?php return; ?>
+<?php endif; ?>
+
+<div class="<?= $block->escapeHtmlAttr($cssClass) ?>">
+    <ul class="banner-minimal-list">
+        <?php foreach ($banners as $banner): ?>
+            <li class="banner-minimal-item" data-banner-id="<?= (int)$banner->getBannerId() ?>">
+                <?= $block->escapeHtml($banner->getTitle()) ?>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+</div>

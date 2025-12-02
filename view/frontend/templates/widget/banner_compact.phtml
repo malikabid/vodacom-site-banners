@@ -1,0 +1,42 @@
+<?php
+/**
+ * Vodacom SiteBanners Widget Template - Compact
+ * 
+ * Compact layout with minimal spacing, ideal for sidebars
+ * 
+ * @var \Vodacom\SiteBanners\Block\Widget\BannerWidget $block
+ * @version 7.0.0
+ */
+
+$banners = $block->getBanners();
+$displayMode = $block->getDisplayMode();
+$cssClass = $block->getCssClass() . ' banner-compact';
+$showTitle = $block->shouldShowTitle();
+$showContent = $block->shouldShowContent();
+
+if (empty($banners)): ?>
+    <!-- No banners to display -->
+    <?php return; ?>
+<?php endif; ?>
+
+<div class="<?= $block->escapeHtmlAttr($cssClass) ?>" data-display-mode="<?= $block->escapeHtmlAttr($displayMode) ?>">
+    
+    <?php foreach ($banners as $banner): ?>
+        <div class="banner-compact-item" data-banner-id="<?= (int)$banner->getBannerId() ?>">
+            
+            <?php if ($showTitle): ?>
+                <h4 class="banner-compact-title">
+                    <?= $block->escapeHtml($banner->getTitle()) ?>
+                </h4>
+            <?php endif; ?>
+            
+            <?php if ($showContent && $banner->getContent()): ?>
+                <div class="banner-compact-content">
+                    <?= /* @noEscape */ $block->filterContent($banner->getContent()) ?>
+                </div>
+            <?php endif; ?>
+            
+        </div>
+    <?php endforeach; ?>
+    
+</div>

@@ -69,6 +69,10 @@
                 <item name="vodacom_banner_demo_patterns" xsi:type="object">
                     Vodacom\SiteBanners\Console\Command\DemonstratePatterns
                 </item>
+                <!-- V6.0.3: Register Around Plugins Test Command -->
+                <item name="vodacom_test_around_plugins" xsi:type="object">
+                    Vodacom\SiteBanners\Console\Command\TestAroundPlugins
+                </item>
             </argument>
         </arguments>
     </type>

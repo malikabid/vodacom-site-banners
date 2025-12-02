@@ -43,13 +43,10 @@
             </parameter>
             
             <!-- Banner Selection Parameter (for single mode) -->
-            <parameter name="banner_id" xsi:type="select" required="false" visible="true" sort_order="20">
-                <label translate="true">Select Banner</label>
-                <description translate="true">Choose specific banner (required for Single mode)</description>
-                <depends>
-                    <parameter name="display_mode" value="single"/>
-                </depends>
-                <source_model>Vodacom\SiteBanners\Model\Config\Source\BannerOptions</source_model>
+            <parameter name="banner_id" xsi:type="select" required="false" visible="true" sort_order="20" 
+                       source_model="Vodacom\SiteBanners\Model\Config\Source\BannerOptions">
+                <label translate="true">Select Banner (Single Mode)</label>
+                <description translate="true">Choose specific banner (required for Single mode only)</description>
             </parameter>
             
             <!-- Banner IDs Parameter (for multiple/grid modes) -->
@@ -57,7 +54,7 @@
                 <label translate="true">Banner IDs</label>
                 <description translate="true">Comma-separated banner IDs (e.g., 1,2,3). Leave empty for all active banners.</description>
                 <depends>
-                    <parameter name="display_mode" value="multiple"/>
+                    <parameter name="display_mode" value="multiple" />
                 </depends>
             </parameter>
             
@@ -65,7 +62,7 @@
                 <label translate="true">Banner IDs</label>
                 <description translate="true">Comma-separated banner IDs (e.g., 1,2,3). Leave empty for all active banners.</description>
                 <depends>
-                    <parameter name="display_mode" value="grid"/>
+                    <parameter name="display_mode" value="grid" />
                 </depends>
             </parameter>
             
@@ -73,7 +70,7 @@
                 <label translate="true">Banner IDs</label>
                 <description translate="true">Comma-separated banner IDs (e.g., 1,2,3). Leave empty for all active banners.</description>
                 <depends>
-                    <parameter name="display_mode" value="slider"/>
+                    <parameter name="display_mode" value="slider" />
                 </depends>
             </parameter>
             
@@ -108,25 +105,25 @@
             <!-- Limit Parameter -->
             <parameter name="limit" xsi:type="text" required="false" visible="true" sort_order="60">
                 <label translate="true">Limit</label>
-                <description translate="true">Maximum number of banners to display (leave empty for no limit)</description>
+                <description translate="true">Maximum number of banners to display (leave empty for no limit).</description>
                 <depends>
-                    <parameter name="display_mode" value="multiple"/>
+                    <parameter name="display_mode" value="multiple" />
                 </depends>
             </parameter>
             
             <parameter name="limit_grid" xsi:type="text" required="false" visible="true" sort_order="61">
                 <label translate="true">Limit</label>
-                <description translate="true">Maximum number of banners to display (leave empty for no limit)</description>
+                <description translate="true">Maximum number of banners to display (leave empty for no limit).</description>
                 <depends>
-                    <parameter name="display_mode" value="grid"/>
+                    <parameter name="display_mode" value="grid" />
                 </depends>
             </parameter>
             
             <parameter name="limit_slider" xsi:type="text" required="false" visible="true" sort_order="62">
                 <label translate="true">Limit</label>
-                <description translate="true">Maximum number of banners to display (leave empty for no limit)</description>
+                <description translate="true">Maximum number of banners to display (leave empty for no limit).</description>
                 <depends>
-                    <parameter name="display_mode" value="slider"/>
+                    <parameter name="display_mode" value="slider" />
                 </depends>
             </parameter>
             
@@ -162,9 +159,6 @@
                         <label translate="true">Descending</label>
                     </option>
                 </options>
-                <depends>
-                    <parameter name="sort_by" value="sort_order"/>
-                </depends>
             </parameter>
             
             <parameter name="sort_direction_date" xsi:type="select" required="false" visible="true" sort_order="81">
@@ -178,9 +172,6 @@
                         <label translate="true">Descending (Newest First)</label>
                     </option>
                 </options>
-                <depends>
-                    <parameter name="sort_by" value="created_at"/>
-                </depends>
             </parameter>
             
             <parameter name="sort_direction_title" xsi:type="select" required="false" visible="true" sort_order="82">
@@ -194,9 +185,6 @@
                         <label translate="true">Z-A</label>
                     </option>
                 </options>
-                <depends>
-                    <parameter name="sort_by" value="title"/>
-                </depends>
             </parameter>
             
             <!-- CSS Class Parameter -->
@@ -222,26 +210,5 @@
                 </options>
             </parameter>
         </parameters>
-        
-        <!-- Supported containers for widget placement -->
-        <supported_containers>
-            <container name="content">
-                <template name="default" value="Vodacom_SiteBanners::widget/banner.phtml"/>
-                <template name="compact" value="Vodacom_SiteBanners::widget/banner_compact.phtml"/>
-                <template name="minimal" value="Vodacom_SiteBanners::widget/banner_minimal.phtml"/>
-            </container>
-            <container name="content.top">
-                <template name="default" value="Vodacom_SiteBanners::widget/banner.phtml"/>
-            </container>
-            <container name="content.bottom">
-                <template name="default" value="Vodacom_SiteBanners::widget/banner.phtml"/>
-            </container>
-            <container name="sidebar.main">
-                <template name="default" value="Vodacom_SiteBanners::widget/banner_compact.phtml"/>
-            </container>
-            <container name="sidebar.additional">
-                <template name="default" value="Vodacom_SiteBanners::widget/banner_compact.phtml"/>
-            </container>
-        </supported_containers>
     </widget>
 </widgets>

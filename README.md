@@ -1625,6 +1625,290 @@ tail -f var/log/system.log | grep -E "(Banner|enhanced|deleted)"
 
 ---
 
+### Version 6.0.3
+**Branch:** `feature/v6.0.3-around-plugins`  
+**Focus:** Around Plugin Implementation - Complete Method Control  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created Around Plugin: `Plugin/BannerRepositoryCacheLayer.php`
+  - Implements cache-aside pattern for save() and getById() operations
+  - Cache HIT: Returns cached data without calling original method (performance win)
+  - Cache MISS: Calls original method, caches result for subsequent requests
+  - Invalidates cache on save() to prevent stale data
+  - Demonstrates how around plugins can SKIP original method execution
+  - In-memory instance cache with cache statistics tracking
+- Created Around Plugin: `Plugin/BannerRepositoryPerformanceMonitor.php`
+  - Measures execution time of getList() operations
+  - Records start time BEFORE $proceed(), calculates duration AFTER
+  - Logs with INFO level for normal queries (< 100ms)
+  - Logs with WARNING level for slow queries (> 100ms) to highlight performance issues
+  - Demonstrates timing capabilities unique to around plugins
+  - Tracks query statistics (result count, page size, filter count)
+- Created Around Plugin: `Plugin/BannerRepositoryCircuitBreaker.php`
+  - Prevents deletion of "protected" banners (sort_order < 10)
+  - Checks protection status BEFORE calling $proceed()
+  - Throws exception and SKIPS $proceed() if banner is protected
+  - Logs approval/rejection for audit trail
+  - Demonstrates conditional execution pattern
+  - Circuit breaker pattern for resource protection
+- Configured around plugins in `etc/di.xml` with comprehensive documentation
+  - CacheLayer (sortOrder 5) - executes first
+  - PerformanceMonitor (sortOrder 10) - executes second
+  - CircuitBreaker (sortOrder 15) - executes third
+- Updated module version to 6.0.3
+
+**Files Changed:**
+- `Plugin/BannerRepositoryCacheLayer.php` (200+ lines) - NEW: Around plugin with caching logic
+- `Plugin/BannerRepositoryPerformanceMonitor.php` (150+ lines) - NEW: Around plugin for timing
+- `Plugin/BannerRepositoryCircuitBreaker.php` (180+ lines) - NEW: Around plugin for protection
+- `etc/di.xml` - Added around plugin configuration with extensive comments explaining execution flow
+- `etc/module.xml` - Updated version to 6.0.3
+- `README.md` - Updated documentation with V6.0.3 details
+
+**Key Concepts Demonstrated:**
+- **Around Plugin Basics**: Method naming convention `around{MethodName}`
+- **The $proceed Callable**: Closure representing original method + remaining plugins
+- **Conditional Execution**: Skip calling $proceed() to bypass original method
+- **Cache-Aside Pattern**: Check cache before proceeding to database
+- **Performance Monitoring**: Measure execution time by wrapping method
+- **Circuit Breaker**: Prevent operations based on business rules
+- **Exception Handling**: Wrap original method in try-catch blocks
+- **Complete Control**: Execute code before AND after original method in one plugin
+
+**Around Plugin Method Signature:**
+```php
+/**
+ * Around plugin method signature pattern
+ * 
+ * @param object $subject Original class instance
+ * @param callable $proceed Closure to execute original method + remaining plugins
+ * @param mixed ...$args Original method parameters
+ * @return mixed Same return type as original method
+ */
+public function around{MethodName}(
+    $subject,           // Repository instance (can call other methods)
+    callable $proceed,  // CRITICAL: Represents original method + remaining plugins
+    ...$args            // Original method parameters
+): ReturnType {        // MUST match original method return type
+    
+    // BEFORE: Execute code before original method
+    // - Log operation start
+    // - Check cache
+    // - Validate conditions
+    // - Record start time
+    
+    // DECISION POINT: Should we call original method?
+    if ($skipCondition) {
+        // Return WITHOUT calling $proceed() - original method never executes
+        return $cachedResult;
+    }
+    
+    // CALL ORIGINAL METHOD: This executes the actual business logic
+    $result = $proceed(...$args);  // Can modify arguments here!
+    
+    // AFTER: Execute code after original method
+    // - Cache the result
+    // - Calculate duration
+    // - Log result
+    // - Transform data
+    
+    return $result;  // Can modify return value here!
+}
+```
+
+**Complete Plugin Execution Flow (All 3 Types):**
+```
+Client calls: bannerRepository.getById(7)
+    ↓
+╔══════════════════════════════════════════════════════════════╗
+║ AROUND PLUGINS - BEFORE $proceed()                          ║
+╚══════════════════════════════════════════════════════════════╝
+    ↓
+1. CacheLayer::aroundGetById() (sortOrder 5)
+   - Checks cache for banner ID 7
+   - CACHE HIT? → Return cached data (SKIP everything below!)
+   - CACHE MISS? → Continue to $proceed()
+    ↓
+2. PerformanceMonitor::aroundGetList() - Not triggered (different method)
+    ↓
+3. CircuitBreaker::aroundDelete() - Not triggered (different method)
+    ↓
+    calls $proceed(7) to continue...
+    ↓
+╔══════════════════════════════════════════════════════════════╗
+║ BEFORE PLUGINS (from V6.0.1)                                ║
+╚══════════════════════════════════════════════════════════════╝
+    ↓
+4. TitleSanitizer::beforeSave() - Not triggered (different method)
+    ↓
+5. SaveLogger::beforeSave() - Not triggered (different method)
+    ↓
+╔══════════════════════════════════════════════════════════════╗
+║ ORIGINAL METHOD EXECUTION                                    ║
+╚══════════════════════════════════════════════════════════════╝
+    ↓
+6. BannerRepository::getById(7)
+   - Queries database for banner ID 7
+   - Returns BannerInterface object
+    ↓
+╔══════════════════════════════════════════════════════════════╗
+║ AFTER PLUGINS (from V6.0.2)                                 ║
+╚══════════════════════════════════════════════════════════════╝
+    ↓
+7. DataEnhancer::afterGetById() (sortOrder 5)
+   - Calculates display status: "active"
+   - Calculates days remaining: 30
+   - Logs computed fields
+    ↓
+8. SearchResultsEnhancer::afterGetList() - Not triggered (different method)
+    ↓
+9. DeleteValidator::afterDelete() - Not triggered (different method)
+    ↓
+╔══════════════════════════════════════════════════════════════╗
+║ AROUND PLUGINS - AFTER $proceed()                           ║
+╚══════════════════════════════════════════════════════════════╝
+    ↓
+10. CacheLayer::aroundGetById() continues
+    - Caches the enhanced banner object
+    - Logs: "Banner ID 7 loaded and cached"
+    ↓
+Enhanced + Cached result returned to client
+```
+
+**The Power of $proceed:**
+```php
+// Example 1: Cache-Aside Pattern (SKIP original method on cache HIT)
+public function aroundGetById($subject, callable $proceed, int $id): BannerInterface
+{
+    if (isset($this->cache[$id])) {
+        // Return cached data - $proceed() NEVER CALLED!
+        return $this->cache[$id];
+    }
+    
+    // Cache miss - call original method
+    $result = $proceed($id);
+    $this->cache[$id] = $result;
+    return $result;
+}
+
+// Example 2: Modify Arguments Before Passing to Original Method
+public function aroundSave($subject, callable $proceed, BannerInterface $banner): BannerInterface
+{
+    // Modify argument before passing to original method
+    $banner->setTitle(strtoupper($banner->getTitle()));
+    
+    // Original method receives MODIFIED banner
+    return $proceed($banner);
+}
+
+// Example 3: Circuit Breaker (PREVENT execution entirely)
+public function aroundDelete($subject, callable $proceed, BannerInterface $banner): bool
+{
+    if ($this->isProtected($banner)) {
+        // DO NOT call $proceed() - original method never executes!
+        throw new CouldNotDeleteException('Banner is protected');
+    }
+    
+    // Approved - proceed with deletion
+    return $proceed($banner);
+}
+
+// Example 4: Exception Handling
+public function aroundSave($subject, callable $proceed, BannerInterface $banner): BannerInterface
+{
+    try {
+        return $proceed($banner);
+    } catch (\Exception $e) {
+        // Catch exceptions from original method
+        $this->logger->error('Save failed: ' . $e->getMessage());
+        throw $e;  // Re-throw or return default value
+    }
+}
+```
+
+**Testing Around Plugins:**
+```bash
+# Run setup:upgrade to apply changes
+bin/magento setup:upgrade
+bin/magento cache:flush
+
+# Test 1: Cache Layer (aroundGetById)
+# - Edit banner in admin (loads banner via getById)
+# - First load: CACHE MISS - logs "loading from database"
+# - Refresh page: CACHE HIT - logs "loaded from cache (skipped database query)"
+# - Save banner: CACHE INVALIDATED - logs "cache invalidated"
+
+# Test 2: Performance Monitor (aroundGetList)
+# - Navigate to banner grid
+# - Check logs for execution time:
+#   Fast query: "[PERFORMANCE] Banner search completed in 45.23 ms"
+#   Slow query: "[PERFORMANCE] Banner search completed in 150.67 ms [SLOW QUERY DETECTED]"
+
+# Test 3: Circuit Breaker (aroundDelete)
+# - Try deleting banner with sort_order < 10 (e.g., "Welcome Banner" = 10)
+# - Should FAIL with error: "Cannot delete protected banner"
+# - Check logs: "[CIRCUIT BREAKER] BLOCKED deletion of protected banner"
+# - Try deleting banner with sort_order >= 10
+# - Should SUCCEED with log: "[CIRCUIT BREAKER] APPROVED deletion"
+
+tail -f var/log/system.log | grep -E "(CACHE|PERFORMANCE|CIRCUIT BREAKER)"
+```
+
+**Real-World Use Cases:**
+- **Caching Layer**: Avoid redundant database queries (Redis, Varnish integration)
+- **Performance Monitoring**: Track slow operations, generate APM data
+- **Circuit Breaker**: Protect critical resources, prevent cascading failures
+- **Rate Limiting**: Throttle API requests per user/IP
+- **Feature Flags**: Enable/disable features without code deployment
+- **Maintenance Mode**: Block operations during system maintenance
+- **Request Validation**: Additional authorization checks
+- **Audit Requirements**: Wrap sensitive operations with logging
+- **A/B Testing**: Route requests to different implementations
+- **Fallback Mechanisms**: Return cached/default data when service unavailable
+
+**Plugin Pattern Comparison:**
+
+| Feature | Before (V6.0.1) | After (V6.0.2) | Around (V6.0.3) |
+|---------|-----------------|----------------|-----------------|
+| **Timing** | Before method | After method | Before AND After |
+| **Access** | Method arguments | Return value | Both + $subject |
+| **Control** | Modify inputs | Modify outputs | Can skip method entirely |
+| **Return** | `array` or `void` | Same as method | Same as method |
+| **Use Case** | Validate/sanitize | Enhance results | Cache/monitor/protect |
+| **Complexity** | Simple | Moderate | Complex |
+| **Power** | Low | Medium | **High** |
+| **When to Use** | Input prep | Output enhancement | Full control needed |
+
+**Plugin Selection Guide:**
+- **Use BEFORE if:** You only need to modify/validate inputs
+- **Use AFTER if:** You only need to enhance/log outputs
+- **Use AROUND if:** You need:
+  - Timing information (before + after)
+  - To skip original method execution
+  - To catch exceptions from original method
+  - To modify both inputs AND outputs
+  - To control whether method executes at all
+
+**CRITICAL Around Plugin Best Practices:**
+1. ✅ **ALWAYS call $proceed()** unless you have a specific reason not to
+2. ✅ **Return same type** as original method
+3. ✅ **Pass correct arguments** to $proceed()
+4. ✅ **Handle exceptions** gracefully (try-catch)
+5. ✅ **Document why** you're skipping $proceed() if you do
+6. ❌ **NEVER** forget to call $proceed() accidentally (breaks functionality)
+7. ❌ **NEVER** call $proceed() multiple times (unpredictable behavior)
+8. ❌ **NEVER** use around when before/after would suffice (simpler = better)
+
+**V6.0.x Plugin Series Summary:**
+- **V6.0.1**: Before Plugins → Modify inputs (sanitize, validate, log)
+- **V6.0.2**: After Plugins → Modify outputs (enhance, transform, audit)
+- **V6.0.3**: Around Plugins → Complete control (cache, monitor, protect)
+
+All three plugin types work together to provide comprehensive extensibility without modifying core code!
+
+---
+
 ## Next Steps
 
 To explore more advanced concepts:
@@ -1632,5 +1916,5 @@ To explore more advanced concepts:
 - **V3.0.0**: Create admin grids and forms with UI Components
 - **V4.0.0**: Implement service contracts and REST APIs
 - **V5.0.0**: Master dependency injection and ViewModels
-- **V6.0.x**: Master plugin patterns (Before, After, Around)
-- **V6.0.0**: Extend core functionality using plugins
+- **V6.0.x**: Master plugin patterns (Before, After, Around) ✅ COMPLETED
+- **V7.0.0**: Widget System Integration (coming soon)

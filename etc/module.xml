@@ -13,10 +13,11 @@
  * - V5.0.3: Implemented ViewModel pattern - moved business logic from Block to ViewModel
  * - V6.0.1: Implemented Before Plugins - TitleSanitizer and SaveLogger
  * - V6.0.2: Implemented After Plugins - DataEnhancer, SearchResultsEnhancer, DeleteValidator
+ * - V6.0.3: Implemented Around Plugins - CacheLayer, PerformanceMonitor, CircuitBreaker
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Vodacom_SiteBanners" setup_version="6.0.2">
+    <module name="Vodacom_SiteBanners" setup_version="6.0.3">
         <sequence>
             <module name="Magento_Theme"/>
             <module name="Magento_Catalog"/>

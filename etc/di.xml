@@ -156,4 +156,114 @@
                 sortOrder="15"/>
     </type>
     
+    <!-- V6.0.3: Around Plugins Configuration -->
+    <!--
+        Around Plugins: The MOST POWERFUL plugin type - execute both BEFORE and AFTER
+        
+        Around plugins wrap the original method, giving you complete control:
+        1. Execute code BEFORE the original method
+        2. Decide WHETHER to call the original method (via $proceed callable)
+        3. Execute code AFTER the original method
+        4. Modify arguments AND return values
+        5. Add exception handling around original method
+        
+        Plugin Method Naming:
+        - Pattern: around{OriginalMethodName}
+        - Example: aroundSave() intercepts save()
+        
+        Method Signature:
+        - First param: $subject (the intercepted class instance)
+        - Second param: callable $proceed (closure representing original method + remaining plugins)
+        - Remaining params: original method parameters
+        - Must return same type as original method
+        
+        The $proceed callable:
+        - Represents the next plugin in the chain OR the original method
+        - You MUST call $proceed(...) to continue execution
+        - You CAN skip calling $proceed() to bypass the original method entirely
+        - Pass modified arguments to $proceed() to change what original method receives
+        
+        Complete Execution Flow (All Plugin Types):
+        
+        Client calls: bannerRepository.save($banner)
+            ↓
+        BEFORE Plugins (V6.0.1):
+          1. TitleSanitizer::beforeSave() (sortOrder 5) - Clean title
+          2. SaveLogger::beforeSave() (sortOrder 10) - Log CREATE/UPDATE
+            ↓
+        AROUND Plugins (V6.0.3) - BEFORE $proceed():
+          3. CacheLayer::aroundSave() (sortOrder 5) - Check cache, invalidate
+          4. (Around plugin calls $proceed($banner))
+            ↓
+        ORIGINAL METHOD:
+          5. BannerRepository::save($banner) - Actual database save
+            ↓
+        AROUND Plugins (V6.0.3) - AFTER $proceed():
+          6. CacheLayer::aroundSave() continues - Log cache invalidation
+            ↓
+        AFTER Plugins (V6.0.2):
+          7. DataEnhancer::afterSave() (sortOrder 5) - Calculate status
+          8. (other after plugins if applicable)
+            ↓
+        Enhanced result returned to client
+        
+        Use Cases:
+        - Caching layer (check cache, skip DB if hit)
+        - Performance monitoring (measure execution time)
+        - Circuit breaker (prevent execution under certain conditions)
+        - Request throttling (rate limiting)
+        - Feature flags (enable/disable features)
+        - Exception handling (wrap method in try-catch)
+        - Conditional execution (skip method based on criteria)
+        
+        WARNING: Around plugins are powerful but can be dangerous!
+        - Always call $proceed() unless you have a specific reason not to
+        - Not calling $proceed() means original method + remaining plugins never execute
+        - Use before/after plugins when possible - only use around when necessary
+    -->
+    <type name="Vodacom\SiteBanners\Model\BannerRepository">
+        <!-- Cache Layer - Implements cache-aside pattern for save/getById -->
+        <!--
+            Pattern: Cache-Aside (Lazy Loading)
+            - aroundSave(): Invalidate cache BEFORE save, confirm AFTER
+            - aroundGetById(): Check cache BEFORE proceed, return cached data if HIT
+            
+            Demonstrates: How around plugins can SKIP original method execution
+            when data is already cached (performance optimization)
+        -->
+        <plugin name="banner_repository_cache_layer" 
+                type="Vodacom\SiteBanners\Plugin\BannerRepositoryCacheLayer" 
+                sortOrder="5"/>
+        
+        <!-- Performance Monitor - Measures execution time of getList() -->
+        <!--
+            Pattern: Performance Profiling
+            - Record start time BEFORE $proceed()
+            - Call $proceed() to execute method
+            - Calculate duration AFTER $proceed() completes
+            - Log with appropriate level (INFO/WARNING for slow queries)
+            
+            Demonstrates: Around plugins have access to timing information
+            that before/after plugins cannot easily capture together
+        -->
+        <plugin name="banner_repository_performance_monitor" 
+                type="Vodacom\SiteBanners\Plugin\BannerRepositoryPerformanceMonitor" 
+                sortOrder="10"/>
+        
+        <!-- Circuit Breaker - Prevents deletion of protected banners -->
+        <!--
+            Pattern: Circuit Breaker / Conditional Execution
+            - Check if banner is protected BEFORE $proceed()
+            - If protected: throw exception, DO NOT call $proceed()
+            - If allowed: call $proceed() to execute deletion
+            - Log approval/rejection
+            
+            Demonstrates: Around plugins can PREVENT method execution entirely
+            based on business rules (e.g., sort_order < 10 = protected)
+        -->
+        <plugin name="banner_repository_circuit_breaker" 
+                type="Vodacom\SiteBanners\Plugin\BannerRepositoryCircuitBreaker" 
+                sortOrder="15"/>
+    </type>
+    
 </config>

@@ -129,6 +129,8 @@ class BannerRepositoryTitleSanitizer
         
         // Step 1: Trim leading/trailing whitespace
         $title = trim($title);
+
+        $title = $this->removeSpecialCharacters($title);
         
         // Step 2: Replace multiple spaces with single space
         // Uses regex: \s+ matches one or more whitespace characters

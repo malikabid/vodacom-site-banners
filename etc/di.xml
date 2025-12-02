@@ -109,4 +109,51 @@
                 sortOrder="10"/>
     </type>
     
+    <!-- V6.0.2: After Plugins Configuration -->
+    <!--
+        After Plugins: Execute AFTER the original method completes
+        
+        Plugin Method Naming:
+        - Pattern: after{OriginalMethodName}
+        - Example: afterSave() intercepts save()
+        
+        Method Signature:
+        - First param: $subject (the intercepted class instance)
+        - Second param: $result (return value from original method)
+        - Remaining params: original method parameters (optional, for context)
+        - Must return same type as original method
+        
+        Execution Flow:
+        1. Before plugins execute (V6.0.1: TitleSanitizer, SaveLogger)
+        2. Original method executes (e.g., save(), getById(), delete())
+        3. After plugins execute in sortOrder:
+           - BannerDataEnhancer (sortOrder 5) - Add computed fields
+           - SearchResultsEnhancer (sortOrder 10) - Add statistics to collections
+           - DeleteValidator (sortOrder 15) - Log delete operations
+        4. Final result returned to caller
+        
+        Use Cases:
+        - Add computed fields to results
+        - Enhance data with real-time calculations
+        - Log operation results
+        - Transform return values
+        - Add metadata/statistics
+    -->
+    <type name="Vodacom\SiteBanners\Model\BannerRepository">
+        <!-- Banner Data Enhancer - Adds computed fields after save/getById -->
+        <plugin name="banner_repository_data_enhancer" 
+                type="Vodacom\SiteBanners\Plugin\BannerDataEnhancer" 
+                sortOrder="5"/>
+        
+        <!-- Search Results Enhancer - Adds statistics to getList() results -->
+        <plugin name="banner_repository_search_results_enhancer" 
+                type="Vodacom\SiteBanners\Plugin\BannerSearchResultsEnhancer" 
+                sortOrder="10"/>
+        
+        <!-- Delete Validator - Logs delete operation results -->
+        <plugin name="banner_repository_delete_validator" 
+                type="Vodacom\SiteBanners\Plugin\BannerDeleteValidator" 
+                sortOrder="15"/>
+    </type>
+    
 </config>

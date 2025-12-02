@@ -1482,6 +1482,149 @@ tail -f var/log/system.log
 
 ---
 
+### Version 6.0.2
+**Branch:** `feature/v6.0.2-after-plugins`  
+**Focus:** After Plugin Implementation - Return Value Modification  
+**Status:** ✅ Completed
+
+**What's New:**
+- Created After Plugin: `Plugin/BannerDataEnhancer.php`
+  - Enhances banner data after save() and getById() operations
+  - Calculates display status (active, scheduled, expired, inactive)
+  - Calculates days remaining until expiration
+  - Logs computed fields for audit/debugging
+  - Demonstrates return value modification pattern
+- Created After Plugin: `Plugin/BannerSearchResultsEnhancer.php`
+  - Enhances getList() search results with aggregate statistics
+  - Calculates total active, scheduled, expired, inactive banners
+  - Provides overview of banner collection status
+  - Demonstrates processing multiple items in results
+- Created After Plugin: `Plugin/BannerDeleteValidator.php`
+  - Logs delete() and deleteById() operation results
+  - Validates deletion success/failure
+  - Provides audit trail for delete operations
+  - Demonstrates handling bool return type
+- Configured after plugins in `etc/di.xml` with proper sortOrder
+  - DataEnhancer (sortOrder 5) - executes first
+  - SearchResultsEnhancer (sortOrder 10) - executes second
+  - DeleteValidator (sortOrder 15) - executes third
+- Updated module version to 6.0.2
+
+**Files Changed:**
+- `Plugin/BannerDataEnhancer.php` - NEW: After plugin for save/getById enhancement
+- `Plugin/BannerSearchResultsEnhancer.php` - NEW: After plugin for getList statistics
+- `Plugin/BannerDeleteValidator.php` - NEW: After plugin for delete logging
+- `etc/di.xml` - Added after plugin configuration with sortOrder
+- `etc/module.xml` - Updated version to 6.0.2
+- `README.md` - Updated documentation with V6.0.2 details
+
+**Key Concepts Demonstrated:**
+- **After Plugin Basics**: Method naming convention `after{MethodName}`
+- **Return Value Modification**: Receiving and potentially modifying method results
+- **Multiple Return Types**: Handling BannerInterface, BannerSearchResultsInterface, bool
+- **Computed Fields**: Adding real-time calculations to results
+- **Aggregate Statistics**: Processing collections for summary data
+- **Error Handling**: Never throwing exceptions in after plugins
+- **Chaining After Plugins**: Multiple after plugins processing same result sequentially
+
+**Plugin Execution Flow:**
+```
+Complete flow with Before + After plugins:
+
+save() method call:
+1. BEFORE Plugins Execute:
+   - TitleSanitizer::beforeSave() (sortOrder 5) - Sanitize title
+   - SaveLogger::beforeSave() (sortOrder 10) - Log operation
+
+2. ORIGINAL METHOD Executes:
+   - BannerRepository::save() - Save to database
+
+3. AFTER Plugins Execute:
+   - DataEnhancer::afterSave() (sortOrder 5) - Calculate status & days remaining
+   - SearchResultsEnhancer::afterGetList() (sortOrder 10) - Add statistics (for getList)
+   - DeleteValidator::afterDelete() (sortOrder 15) - Log result (for delete)
+
+4. Final enhanced result returned to caller
+```
+
+**After Plugin Method Signatures:**
+```php
+// Pattern for returning single object
+public function afterSave(
+    BannerRepositoryInterface $subject,  // Repository instance
+    BannerInterface $result,              // Original method return value
+    BannerInterface $banner               // Original method parameter (optional, for context)
+): BannerInterface {                      // Must return same type
+    // Enhance $result here
+    return $result;
+}
+
+// Pattern for returning bool
+public function afterDelete(
+    BannerRepositoryInterface $subject,
+    bool $result,                         // Success/failure
+    BannerInterface $banner
+): bool {
+    // Log or validate result
+    return $result;
+}
+
+// Pattern for returning search results
+public function afterGetList(
+    BannerRepositoryInterface $subject,
+    BannerSearchResultsInterface $result  // Collection results
+): BannerSearchResultsInterface {
+    // Process collection, add statistics
+    return $result;
+}
+```
+
+**Testing After Plugins:**
+```bash
+# Run setup:upgrade to apply changes
+bin/magento setup:upgrade
+bin/magento cache:flush
+
+# Test 1: Save a banner with future expiration date
+# - Create banner with active_to = 7 days from now
+# - Check logs for "Days until expiration: 7"
+# - Check logs for "Display status: active"
+
+# Test 2: Fetch banner grid (getList)
+# - Navigate to Vodacom > Site Banners in admin
+# - Check logs for statistics summary:
+#   "Banner search results enhanced - Total: X, Active: Y, Scheduled: Z, Expired: W"
+
+# Test 3: Delete a banner
+# - Delete any banner from grid
+# - Check logs for "Banner successfully deleted - ID: X, Title: 'Y'"
+
+tail -f var/log/system.log | grep -E "(Banner|enhanced|deleted)"
+```
+
+**Real-World Use Cases:**
+- **Display Status Badges**: Show "Active", "Scheduled", "Expired" badges in admin grid
+- **Expiration Alerts**: Warn users when banners are about to expire
+- **Dashboard Statistics**: Display overview of banner health (active vs expired)
+- **Audit Compliance**: Log all deletion operations for regulatory requirements
+- **Performance Insights**: Calculate metrics without modifying database schema
+- **Data Enrichment**: Add computed fields like view counts, click rates, engagement scores
+
+**Before vs After Plugin Comparison:**
+| Aspect | Before Plugin (V6.0.1) | After Plugin (V6.0.2) |
+|--------|------------------------|------------------------|
+| **Execution** | Before original method | After original method |
+| **Input** | Method arguments | Method return value |
+| **Output** | Modified arguments (array) OR void | Modified return value (same type) |
+| **Use Case** | Validate, sanitize, log inputs | Enhance, transform, log outputs |
+| **Return Type** | `array` or `void` | Same as original method |
+| **Example** | Sanitize title before save | Add computed fields after save |
+
+**Next Steps:**
+- V6.0.3: Implement Around Plugins for caching, performance optimization, and complete control
+
+---
+
 ## Next Steps
 
 To explore more advanced concepts:
